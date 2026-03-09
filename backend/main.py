@@ -1,20 +1,8 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-# from pydantic import BaseModel
-# from typing import List, Dict, Any
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+from app.main import app
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    from app.database import USE_REAL_DB
+    return {"message": "Armatrix API is running", "db_mode": "REAL_DB" if USE_REAL_DB else "MEMORY"}
+
+
