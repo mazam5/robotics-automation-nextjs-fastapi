@@ -30,7 +30,7 @@ export default function ContactSection() {
         <section
             id="contact"
             ref={containerRef}
-            className="relative md:py-16 px-4 transition-colors duration-1000 overflow-hidden"
+            className="relative md:py-12 px-4 transition-colors duration-1000 overflow-hidden"
         >
 
             <div className="max-w-7xl mx-auto relative z-10">
@@ -45,7 +45,7 @@ export default function ContactSection() {
                             </span>
                         </div>
 
-                        <h2 className="text-6xl md:text-9xl font-bold mb-12 tracking-tighter leading-none transition-colors duration-700">
+                        <h2 className="text-4xl md:text-7xl font-bold mb-12 tracking-tighter leading-none transition-colors duration-700">
                             Get In <br />
                             <span className="opacity-50">Touch</span>
                         </h2>
@@ -57,7 +57,7 @@ export default function ContactSection() {
                                 </h3>
                                 <a
                                     href="mailto:contact@armatrix.in"
-                                    className="text-3xl md:text-5xl font-light hover:text-blue-600 transition-colors underline decoration-current/20 underline-offset-8"
+                                    className="text-xl sm:text-3xl md:text-5xl font-light hover:text-blue-600 transition-colors underline decoration-current/20 underline-offset-8 break-all"
                                 >
                                     contact@armatrix.in
                                 </a>
@@ -67,14 +67,14 @@ export default function ContactSection() {
                                 <h3 className="opacity-40 font-mono text-xs uppercase tracking-widest mb-4">
                                     Visit Us
                                 </h3>
-                                <p className="text-xl md:text-2xl font-light leading-relaxed text-wrap max-w-md opacity-70">
+                                <p className=" md:text-xl font-light leading-relaxed text-wrap max-w-md opacity-70">
                                     4th Floor, 444 Jai Tower
                                     Sri Balaji Krupa Layout, RK Hegde Nagar
                                     Bengaluru - 560077
                                 </p>
                             </div>
 
-                            <div className="pt-4">
+                            <div className="">
                                 <a
                                     href="https://maps.app.goo.gl/rrSmTCiuJjS2ZrEm7"
                                     target="_blank"

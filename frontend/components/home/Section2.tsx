@@ -93,14 +93,14 @@ const Section2 = () => {
                     <div className="md:w-[80%]">
                         <h2
                             ref={titleRef}
-                            className="text-xl md:text-3xl leading-[1.1] tracking-[0.3em] mb-8"
+                            className="text-lg md:text-3xl leading-[1.1] tracking-[0.2em] md:tracking-[0.3em] mb-4 md:mb-8"
                         >
                             Snake-like Robotic Arm
                         </h2>
 
                         <p
                             ref={descRef}
-                            className="text-3xl md:text-7xl text-wrap wrap-normal font-bold leading-[1.1] tracking-wider"
+                            className="text-3xl sm:text-4xl md:text-7xl text-wrap wrap-normal font-bold leading-[1.1] tracking-wider"
                         >
                             Robotic arms designed  to inspect tight spaces within complex machinery
                         </p>

@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { TeamMember, TeamMemberCreate, TeamMemberUpdate } from './types';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL + '/api',
 });
 
 export const api = {
@@ -18,7 +18,10 @@ export const api = {
     return response.data;
   },
 
-  async updateTeamMember(id: string, data: TeamMemberUpdate): Promise<TeamMember> {
+  async updateTeamMember(
+    id: string,
+    data: TeamMemberUpdate,
+  ): Promise<TeamMember> {
     const response = await axiosInstance.put(`/team/${id}`, data);
     return response.data;
   },

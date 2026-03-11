@@ -18,7 +18,14 @@ async def get_team_members(db=Depends(get_db)):
 @router.post("/", response_model=TeamMember, status_code=201)
 async def create_team_member(member_in: TeamMemberCreate, db=Depends(get_db)):
     new_id = str(uuid.uuid4())
-    db_member = TeamMemberDB(id=new_id, **member_in.model_dump())
+    member_data = member_in.model_dump()
+    
+    # Assign default avatar if photo_url is missing or empty
+    if not member_data.get("photo_url"):
+        name_param = member_data.get("name", "Member").replace(" ", "+")
+        member_data["photo_url"] = f"https://ui-avatars.com/api/?name={name_param}&background=random&color=fff&size=512"
+        
+    db_member = TeamMemberDB(id=new_id, **member_data)
     db.add(db_member)
     db.commit()
     db.refresh(db_member)

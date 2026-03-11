@@ -13,13 +13,13 @@ interface TeamMemberCardProps {
 
 export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps) {
     return (
-        <Card className="team-card relative overflow-hidden bg-zinc-950/50 border-white/5 backdrop-blur-2xl transition-all duration-500 hover:border-blue-500/30 group will-change-transform shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.1)]">
+        <Card className="team-card h-full flex flex-col relative overflow-hidden bg-zinc-950/50 border-white/5 backdrop-blur-2xl transition-all duration-500 hover:border-blue-500/30 group will-change-transform shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.1)]">
             <CardHeader className="p-0">
                 <div className="w-full h-56 overflow-hidden relative">
                     <div className="absolute inset-0 bg-zinc-900" />
                     {member.photo_url && (
                         <img
-                            src={member.photo_url}
+                            src={member.photo_url || `https://ui-avatars.com/api/?name=${member.name.replace(" ", "+")}&background=random&color=fff&size=512`}
                             alt={member.name}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 relative z-10 brightness-[0.8] grayscale-[0.2] group-hover:grayscale-0 group-hover:brightness-100"
                             onError={(e) => {
@@ -30,7 +30,7 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
                     <div className="absolute inset-0 bg-linear-to-t from-zinc-950 via-zinc-950/20 to-transparent z-20" />
                 </div>
             </CardHeader>
-            <CardContent className="p-8 relative z-30">
+            <CardContent className="p-6 md:p-8 relative z-30 flex-1">
                 <h3 className="text-2xl font-bold text-white mb-2 tracking-tight group-hover:text-blue-400 transition-colors">{member.name}</h3>
                 <p className="text-sm text-blue-500/80 font-mono tracking-widest uppercase mb-4">{member.role}</p>
                 <p className="text-zinc-500 text-sm leading-relaxed line-clamp-3 group-hover:text-zinc-400 transition-colors">{member.bio}</p>

@@ -57,7 +57,7 @@ export default function Navbar() {
         <nav
             ref={navRef}
             className={cn(
-                "absolute top-0 left-0 right-0 z-100 py-5 my-16 w-4/5 mx-auto",
+                "absolute top-0 left-0 right-0 z-100 py-3 md:py-5 my-6 md:my-8 lg:my-12 xl:my-16 w-[92%] md:w-4/5 mx-auto",
                 isLightMode ? "text-black" : "text-white"
             )}
         >
@@ -69,9 +69,9 @@ export default function Navbar() {
                             : "https://armatrix.in/assets/images/logo/Logo_2_white.webp"
                         }
                         alt="Logo"
-                        width={isLightMode ? 140 : 120}
-                        height={isLightMode ? 140 : 120}
-                        className="transition-all duration-700"
+                        width={isLightMode ? 120 : 100}
+                        height={isLightMode ? 120 : 100}
+                        className="transition-all duration-700 w-[100px] md:w-[140px] h-auto"
                     />
                 </Link>
 

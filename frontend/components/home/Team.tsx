@@ -7,11 +7,17 @@ import { api } from '@/lib/api';
 import { TeamMember, TeamMemberCreate, TeamMemberUpdate } from '@/lib/types';
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/all';
-import { MoveRight, Plus, UserPlus } from 'lucide-react';
+import { MoveRight, UserPlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+gsap.registerPlugin(useGSAP);
 
 const Team = () => {
     const [members, setMembers] = useState<TeamMember[]>([]);
@@ -35,11 +41,8 @@ const Team = () => {
         }
     };
 
-    const horizontalRef = useRef<HTMLDivElement>(null);
-
     useGSAP(() => {
         if (!loading && members.length > 0) {
-
             // Text Header Animation
             gsap.fromTo(
                 containerRef.current?.querySelectorAll(".team-header-element") || [],
@@ -52,39 +55,8 @@ const Team = () => {
                     stagger: 0.15,
                     duration: 1.2,
                     ease: "expo.out",
-                    scrollTrigger: {
-                        trigger: containerRef.current,
-                        start: "top 80%",
-                    }
                 }
             );
-
-            // Horizontal Scroll Animation
-            const mm = gsap.matchMedia();
-
-            mm.add("(min-width: 768px)", () => {
-                const totalWidth = horizontalRef.current?.scrollWidth || 0;
-                const viewportWidth = window.innerWidth;
-                const scrollAmount = totalWidth - viewportWidth + 100; // adding some padding
-
-                if (scrollAmount > 0) {
-                    gsap.to(horizontalRef.current, {
-                        x: -scrollAmount,
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: containerRef.current,
-                            start: "top top",
-                            end: `+=${scrollAmount}`,
-                            pin: true,
-                            scrub: 1,
-                            invalidateOnRefresh: true,
-                        }
-                    });
-                }
-            });
-
-            // Fallback for mobile if needed, or keeping it as is.
-            // For now, let's keep the grid/vertical flow on mobile as it's more standard.
         }
     }, { dependencies: [loading, members], scope: containerRef });
 
@@ -105,7 +77,6 @@ const Team = () => {
     };
 
     const openAddDialog = () => {
-
         setMemberToEdit(null);
         setDialogOpen(true);
     };
@@ -114,6 +85,7 @@ const Team = () => {
         setMemberToEdit(member);
         setDialogOpen(true);
     };
+
     return (
         <section
             id="team"
@@ -121,7 +93,7 @@ const Team = () => {
             className="relative py-24 md:py-32 px-4 md:px-0 md:w-4/5 mx-auto bg-transparent transition-colors duration-1000 overflow-hidden"
         >
             <div className="max-w-7xl mx-auto relative z-10 mt-20">
-                <div className="flex items-center gap-4 mb-12 cursor-default">
+                <div className="flex items-center gap-4 mb-8 cursor-default">
                     <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter arrow-span">
                         <MoveRight />
                     </span>
@@ -129,7 +101,8 @@ const Team = () => {
                         Our Team
                     </span>
                 </div>
-                <header className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6">
+
+                <header className="md:mb-12 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="max-w-2xl">
                         <h1 className="team-header-element text-4xl md:text-6xl font-bold text-white mb-6 tracking-tighter">
                             Meet the <br />
@@ -148,33 +121,43 @@ const Team = () => {
                 </header>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 team-grid">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[1, 2, 3, 4].map((i) => (
                             <div key={i} className="h-96 rounded-xl bg-white/5 animate-pulse" />
                         ))}
                     </div>
                 ) : members.length === 0 ? (
-                    <div className="text-center py-20 text-gray-400 team-grid">
+                    <div className="text-center py-20 text-gray-400">
                         <h3 className="text-2xl font-semibold text-white mb-2">No team members yet</h3>
                         <p>Click the "Add Member" button to get started.</p>
                     </div>
                 ) : (
-                    <div className="md:relative -mx-4 px-4 overflow-visible">
-                        <div
-                            ref={horizontalRef}
-                            className="flex flex-col md:flex-row gap-6 team-grid min-h-[50vh] transition-all duration-300 w-full md:w-max"
-                        >
+                    <Carousel
+                        opts={{
+                            align: "start",
+                            loop: false,
+                        }}
+                        className="w-full"
+                    >
+                        <div className="flex items-center justify-end gap-2 mb-4">
+                            <CarouselPrevious className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
+                            <CarouselNext className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
+                        </div>
+                        <CarouselContent className="-ml-4">
                             {members.map((member) => (
-                                <div key={member.id} className="w-full md:w-87.5 shrink-0">
+                                <CarouselItem
+                                    key={member.id}
+                                    className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                                >
                                     <TeamMemberCard
                                         member={member}
                                         onEdit={openEditDialog}
                                         onDelete={handleDelete}
                                     />
-                                </div>
+                                </CarouselItem>
                             ))}
-                        </div>
-                    </div>
+                        </CarouselContent>
+                    </Carousel>
                 )}
             </div>
 
@@ -185,7 +168,7 @@ const Team = () => {
                 onSave={handleSave}
             />
         </section>
-    )
-}
+    );
+};
 
-export default Team
+export default Team;

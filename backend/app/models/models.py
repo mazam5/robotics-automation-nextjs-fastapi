@@ -7,6 +7,6 @@ class TeamMemberDB(Base):
     name = Column(String(255), nullable=False)
     role = Column(String(255), nullable=False)
     bio = Column(Text, nullable=False)
-    photo_url = Column(String(1024), nullable=False)
+    photo_url = Column(String(1024), nullable=True)
     linkedin_url = Column(String(1024), nullable=True)
     github_url = Column(String(1024), nullable=True)

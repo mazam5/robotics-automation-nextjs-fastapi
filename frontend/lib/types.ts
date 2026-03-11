@@ -32,7 +32,7 @@ export const teamMemberSchema = z.object({
   name: z.string().min(2, "Name is required"),
   role: z.string().min(2, "Role is required"),
   bio: z.string().min(5, "Bio is required"),
-  photo_url: z.string().url("Enter a valid URL"),
+  photo_url: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   linkedin_url: z.string().optional(),
   github_url: z.string().optional(),
 });

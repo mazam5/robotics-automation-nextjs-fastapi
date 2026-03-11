@@ -66,7 +66,7 @@ function HeroPhrases() {
     }, [index]);
 
     return (
-        <span className="inline-flex gap-16 text-white">
+        <span className="inline-flex gap-4 md:gap-16 text-white">
             <span
                 ref={word1Ref}
                 className="text-5xl md:text-7xl tracking-tighter font-light"
@@ -103,7 +103,7 @@ const Hero = () => {
             <div className="parallax-bg absolute top-1/4 left-1/4 w-75 md:w-150 h-75 md:h-150 bg-blue-600/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none" />
             <div className="parallax-bg absolute bottom-1/4 right-1/4 w-62.5 md:w-125 h-62.5 md:h-125 bg-purple-600/10 rounded-full blur-[70px] md:blur-[100px] pointer-events-none" />
 
-            <h1 className="hero-element text-4xl md:text-7xl lg:text-[110px] leading-none font-bold tracking-tighter mb-6 md:mb-10 max-w-6xl relative z-10">
+            <h1 className="hero-element text-4xl sm:text-5xl md:text-7xl lg:text-[110px] leading-none font-bold tracking-tighter mb-6 md:mb-10 max-w-6xl relative z-10">
                 <HeroPhrases />
             </h1>
 

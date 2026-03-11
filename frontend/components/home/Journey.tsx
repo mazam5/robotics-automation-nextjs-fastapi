@@ -154,7 +154,7 @@ const JourneyItem = ({ ms, index }: { ms: Milestone; index: number }) => {
 
     return (
         <div
-            className={`relative journey-item flex flex-col items-center shrink-0 w-[24rem] ${ms.position === "top" ? "mb-72" : "mt-72"
+            className={`relative journey-item flex flex-col items-center shrink-0 w-[18rem] md:w-[24rem] ${ms.position === "top" ? "mb-40 md:mb-72" : "mt-40 md:mt-72"
                 }`}
         >
             {/* Simple Vertical Indicator */}
@@ -168,7 +168,7 @@ const JourneyItem = ({ ms, index }: { ms: Milestone; index: number }) => {
                 ref={cardRef}
                 onMouseEnter={handleHover}
                 onMouseLeave={handleLeave}
-                className="journey-card w-full p-8 rounded-[2rem] bg-zinc-950 border border-yellow-500/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col cursor-default group"
+                className="journey-card w-full p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] bg-zinc-950 border border-yellow-500/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col cursor-default group"
             >
                 <div ref={glowRef} className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-500/10 rounded-full blur-[80px] opacity-100 transition-opacity" />
 
@@ -181,7 +181,7 @@ const JourneyItem = ({ ms, index }: { ms: Milestone; index: number }) => {
                     </div>
                 </div>
 
-                <h4 ref={titleRef} className="text-white text-xl font-bold mb-3 tracking-tight z-10 transition-colors">
+                <h4 ref={titleRef} className="text-white text-lg md:text-xl font-bold mb-3 tracking-tight z-10 transition-colors">
                     {ms.title}
                 </h4>
                 <p className="text-zinc-500 text-sm leading-relaxed font-light z-10 group-hover:text-zinc-400 transition-colors">
@@ -302,7 +302,7 @@ const Journey = () => {
             </div>
             <div
                 ref={wrapperRef}
-                className="journey-wrapper relative flex items-center h-full min-w-max px-[20vw]"
+                className="journey-wrapper relative flex items-center h-full min-w-max px-8 md:px-[20vw]"
             >
                 {/* Simplified Straight Timeline Line */}
                 <div className="absolute top-1/2 left-0 w-full h-0.5 bg-zinc-800 z-0">

@@ -29,7 +29,7 @@ const teamMemberSchema = z.object({
     name: z.string().min(2, "Name is required"),
     role: z.string().min(2, "Role is required"),
     bio: z.string().min(5, "Bio is required"),
-    photo_url: z.url("Enter a valid URL"),
+    photo_url: z.url("Enter a valid URL").optional().or(z.literal("")),
     linkedin_url: z.string().optional(),
     github_url: z.string().optional(),
 });
@@ -91,11 +91,12 @@ export function AddMemberDialog({
     const onSubmit = async (data: FormValues) => {
         await onSave(data, memberToEdit?.id);
         onOpenChange(false);
+        reset(defaultValues);
     };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-zinc-900 border-white/10 text-white sm:max-w-106.25">
+            <DialogContent className="bg-zinc-900 border-white/10 text-white w-[95vw] sm:max-w-106.25">
 
                 <DialogHeader>
                     <DialogTitle>
@@ -108,7 +109,7 @@ export function AddMemberDialog({
                     {/* Name */}
                     <div className="grid gap-2">
                         <Label>Name *</Label>
-                        <Input {...register("name")} required className="bg-zinc-800 border-zinc-700" />
+                        <Input {...register("name")} required className="bg-zinc-800 border-zinc-700 text-base" />
                         {errors.name && (
                             <p className="text-red-400 text-sm">{errors.name.message}</p>
                         )}
@@ -134,14 +135,8 @@ export function AddMemberDialog({
 
                     {/* Photo URL */}
                     <div className="grid gap-2">
-                        <Label>Photo URL *</Label>
-
-                        {/* <InputGroupAddon>
-                                <InputGroupText>https://</InputGroupText>
-                            </InputGroupAddon> */}
-
+                        <Label>Photo URL (Optional)</Label>
                         <Input
-                            required
                             placeholder="example.com/photo.jpg"
                             {...register("photo_url")}
                             className="bg-zinc-800 border-zinc-700"
