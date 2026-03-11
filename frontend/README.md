@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Armatrix Frontend
 
-## Getting Started
+The frontend of Armatrix is a modern Next.js application designed to provide a premium, interactive user experience. It features high-end GSAP animations, a responsive design system, and a robust administrative interface for team management.
 
-First, run the development server:
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [GSAP](https://greensock.com/gsap/) (GreenSock Animation Platform)
+- **UI Components**: [Shadcn UI](https://ui.shadcn.com/) (based on Radix UI)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Form Handling**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
+- **Scroll Library**: [Lenis](https://github.com/darkroomengineering/lenis) (Smooth Scroll)
+
+## 🚀 Getting Started
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Set Up Environment Variables
+
+Create a `.env.local` file (if not already present) and configure any necessary API endpoints:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```
+
+### 3. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Snake-like Visualization**: Interactive components showcasing robotic arm capabilities.
+- **Horizontal Journey**: A smooth-scrolling timeline of milestones.
+- **Team Management**: A Shadcn Carousel-based team display with full CRUD capabilities (Add/Edit/Delete members).
+- **Responsive Animations**: Animations are optimized for all screen sizes, ensuring a premium feel on mobile and desktop alike.
 
-## Learn More
+## 📁 Key Directories
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/app`: Next.js App Router pages and global layouts.
+- `/components`: Reusable UI components (Shared and Section-specific).
+- `/lib`: Utility functions, API clients, and TypeScript types.
+- `/public`: Static assets (images, logos, videos).
