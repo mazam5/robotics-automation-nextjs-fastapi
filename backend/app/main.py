@@ -1,16 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .database.database import USE_REAL_DB, Base, engine
 from dotenv import load_dotenv
-from .routes import team
-
+import logging
 load_dotenv()
 
-import logging
+logging.basicConfig(level=logging.INFO)
 
-if USE_REAL_DB and engine and Base:
+from .database.database import Base, engine
+from .routes import team
+
+if engine and Base:
     try:
-        logging.basicConfig(level=logging.INFO)
         Base.metadata.create_all(bind=engine)
         logging.info("Successfully connected to the database.")
     except Exception as e:
