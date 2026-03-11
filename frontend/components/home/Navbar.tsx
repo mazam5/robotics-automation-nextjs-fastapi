@@ -84,7 +84,7 @@ export default function Navbar() {
                             onMouseEnter={handleLinkMouseEnter}
                             onMouseLeave={handleLinkMouseLeave}
                             className={cn(
-                                "text-xl font-medium uppercase transition-colors duration-700",
+                                "text-xl font-medium uppercase transition-colors duration-700 hover:underline underline-offset-8",
                                 isLightMode ? "text-zinc-600 hover:text-black" : "text-zinc-400 hover:text-white"
                             )}
                         >

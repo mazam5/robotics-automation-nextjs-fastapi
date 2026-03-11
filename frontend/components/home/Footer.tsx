@@ -41,11 +41,11 @@ const Footer = () => {
     return (
         <footer
             ref={footerRef}
-            className="border-t border-current/10 bg-transparent py-20 px-8 md:px-24 transition-colors duration-1000"
+            className="border-t border-current/10 bg-transparent py-10 px-8 md:px-24 transition-colors duration-1000"
         >
             <div ref={contentRef} className="max-w-7xl mx-auto opacity-0">
                 {/* Top: Logo + Links */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-10">
                     <div className="col-span-1 md:col-span-2">
                         <Image
                             src="https://armatrix.in/assets/images/logo/registered_logo.png"

@@ -30,14 +30,14 @@ export default function ContactSection() {
         <section
             id="contact"
             ref={containerRef}
-            className="relative py-32 md:py-48 px-4 transition-colors duration-1000 overflow-hidden"
+            className="relative md:py-16 px-4 transition-colors duration-1000 overflow-hidden"
         >
 
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-20 md:gap-32 items-center">
                     <div>
                         <div className="flex items-center gap-4 cursor-default mb-4">
-                            <span className="text-white/95 dark:text-black/95  font-bold opacity-30 select-none tracking-tighter arrow-span">
+                            <span className="text-black/95 font-bold opacity-30 select-none tracking-tighter arrow-span">
                                 <MoveRight />
                             </span>
                             <span className="font-mono text-xs tracking-[0.4em] uppercase">
@@ -67,9 +67,9 @@ export default function ContactSection() {
                                 <h3 className="opacity-40 font-mono text-xs uppercase tracking-widest mb-4">
                                     Visit Us
                                 </h3>
-                                <p className="text-xl md:text-2xl font-light leading-relaxed max-w-md opacity-70">
-                                    4th Floor, 444 Jai Tower <br />
-                                    Sri Balaji Krupa Layout, RK Hegde Nagar <br />
+                                <p className="text-xl md:text-2xl font-light leading-relaxed text-wrap max-w-md opacity-70">
+                                    4th Floor, 444 Jai Tower
+                                    Sri Balaji Krupa Layout, RK Hegde Nagar
                                     Bengaluru - 560077
                                 </p>
                             </div>

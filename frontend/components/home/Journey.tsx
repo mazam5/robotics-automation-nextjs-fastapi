@@ -290,14 +290,14 @@ const Journey = () => {
             <div className="absolute top-16 inset-x-0 z-20">
                 <div className="md:w-4/5 mx-auto max-w-7xl px-4 md:px-0">
                     <div className="flex items-center gap-4 cursor-default">
-                        <span className="text-white/95 dark:text-zinc-800 font-bold opacity-30 select-none tracking-tighter arrow-span">
+                        <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter arrow-span">
                             <MoveRight />
                         </span>
                         <span className="font-mono text-xs tracking-[0.4em] uppercase">
                             OUR JOURNEY
                         </span>
                     </div>
-                    <h2 className="text-4xl md:text-6xl font-bold mt-4 tracking-tighter">Milestones</h2>
+                    {/* <h2 className="text-4xl md:text-6xl font-bold mt-4 tracking-tighter">Milestones</h2> */}
                 </div>
             </div>
             <div
@@ -319,7 +319,7 @@ const Journey = () => {
                     ))}
 
                     {/* Spacer for end scroll */}
-                    <div className="w-[5vw] shrink-0" />
+                    {/* <div className="w-[5vw] shrink-0" /> */}
                 </div>
             </div>
         </section>

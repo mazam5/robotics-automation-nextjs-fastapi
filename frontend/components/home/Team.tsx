@@ -121,12 +121,12 @@ const Team = () => {
             className="relative py-24 md:py-32 px-4 md:px-0 md:w-4/5 mx-auto bg-transparent transition-colors duration-1000 overflow-hidden"
         >
             <div className="max-w-7xl mx-auto relative z-10 mt-20">
-                <div className="flex items-center gap-4 mb-4 cursor-default">
+                <div className="flex items-center gap-4 mb-12 cursor-default">
                     <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter arrow-span">
                         <MoveRight />
                     </span>
                     <span className="font-mono text-xs tracking-[0.4em] uppercase">
-                        Team
+                        Our Team
                     </span>
                 </div>
                 <header className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6">

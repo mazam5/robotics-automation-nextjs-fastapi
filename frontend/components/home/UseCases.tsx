@@ -133,7 +133,7 @@ const UseCases: React.FC = () => {
         >
             <div className="max-w-7xl mx-auto w-full px-4 md:px-0">
                 {/* Mobile heading */}
-                <div className="relative z-10 text-center pt-20 pb-6 md:hidden">
+                <div className="relative z-10 text-center pt-10 pb-6 md:hidden">
                     <span className="text-white/95 font-mono text-sm tracking-[0.3em] uppercase">
                         Use Cases
                     </span>
