@@ -1,74 +1,98 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { MoveRight, SquareArrowOutUpRight } from "lucide-react";
+import { useRef } from "react";
 
 export default function ContactSection() {
-    return (
-        <section id="contact" className="relative py-24 md:py-40 px-4 transition-colors duration-1000">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
-                    <div>
-                        <span className="text-blue-600 font-mono text-sm tracking-[0.3em] uppercase mb-4 block">Get In Touch</span>
-                        <h2 className="text-5xl md:text-8xl font-bold tracking-tighter mb-8 text-black">
-                            Let's build the future together.
-                        </h2>
-                        <p className="text-xl text-zinc-600 mb-12 max-w-lg leading-relaxed">
-                            Whether you have a specific inquiry or just want to learn more about our technology, our team is ready to connect.
-                        </p>
+    const containerRef = useRef<HTMLElement>(null);
 
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-4 text-zinc-900">
-                                <div className="p-3 rounded-xl bg-blue-100 text-blue-600">
-                                    <Mail className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-mono text-zinc-500 uppercase">Email</p>
-                                    <p className="text-lg font-semibold">hello@armatrix.io</p>
-                                </div>
+    useGSAP(() => {
+        gsap.fromTo(
+            containerRef.current,
+            { opacity: 0, y: 30 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "expo.out",
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top 90%",
+                    toggleActions: "play none none reverse",
+                },
+            }
+        );
+    }, { scope: containerRef });
+
+    return (
+        <section
+            id="contact"
+            ref={containerRef}
+            className="relative py-32 md:py-48 px-4 transition-colors duration-1000 overflow-hidden"
+        >
+
+            <div className="max-w-7xl mx-auto relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-20 md:gap-32 items-center">
+                    <div>
+                        <div className="flex items-center gap-4 cursor-default mb-4">
+                            <span className="text-white/95 dark:text-black/95  font-bold opacity-30 select-none tracking-tighter arrow-span">
+                                <MoveRight />
+                            </span>
+                            <span className="font-mono text-xs tracking-[0.4em] uppercase">
+                                Contact
+                            </span>
+                        </div>
+
+                        <h2 className="text-6xl md:text-9xl font-bold mb-12 tracking-tighter leading-none transition-colors duration-700">
+                            Get In <br />
+                            <span className="opacity-50">Touch</span>
+                        </h2>
+
+                        <div className="space-y-12">
+                            <div>
+                                <h3 className="opacity-40 font-mono text-xs uppercase tracking-widest mb-4">
+                                    Email Us
+                                </h3>
+                                <a
+                                    href="mailto:contact@armatrix.in"
+                                    className="text-3xl md:text-5xl font-light hover:text-blue-600 transition-colors underline decoration-current/20 underline-offset-8"
+                                >
+                                    contact@armatrix.in
+                                </a>
                             </div>
-                            <div className="flex items-center gap-4 text-zinc-900">
-                                <div className="p-3 rounded-xl bg-purple-100 text-purple-600">
-                                    <MapPin className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-mono text-zinc-500 uppercase">HQ</p>
-                                    <p className="text-lg font-semibold">Silicon Valley, CA</p>
-                                </div>
+
+                            <div>
+                                <h3 className="opacity-40 font-mono text-xs uppercase tracking-widest mb-4">
+                                    Visit Us
+                                </h3>
+                                <p className="text-xl md:text-2xl font-light leading-relaxed max-w-md opacity-70">
+                                    4th Floor, 444 Jai Tower <br />
+                                    Sri Balaji Krupa Layout, RK Hegde Nagar <br />
+                                    Bengaluru - 560077
+                                </p>
+                            </div>
+
+                            <div className="pt-4">
+                                <a
+                                    href="https://maps.app.goo.gl/rrSmTCiuJjS2ZrEm7"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="
+                                        inline-flex items-center gap-2
+                                        px-8 py-4 rounded-full
+                                        border border-current
+                                        opacity-70 hover:opacity-100
+                                        hover:bg-current/10
+                                        transition-all group
+                                    "
+                                >
+                                    View on Map
+                                    <SquareArrowOutUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                </a>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-500/10 border border-zinc-100">
-                        <form className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-700 ml-1">Full Name</label>
-                                <input
-                                    type="text"
-                                    placeholder="John Doe"
-                                    className="w-full px-6 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-zinc-900 transition-all font-sans"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-700 ml-1">Email Address</label>
-                                <input
-                                    type="email"
-                                    placeholder="john@example.com"
-                                    className="w-full px-6 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-zinc-900 transition-all font-sans"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-700 ml-1">Message</label>
-                                <textarea
-                                    rows={4}
-                                    placeholder="Tell us about your project..."
-                                    className="w-full px-6 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-zinc-900 transition-all font-sans resize-none"
-                                />
-                            </div>
-                            <Button className="w-full rounded-2xl py-8 text-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300">
-                                Send Message <ArrowRight className="ml-2 w-5 h-5" />
-                            </Button>
-                        </form>
                     </div>
                 </div>
             </div>

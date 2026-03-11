@@ -3,6 +3,27 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import InteractiveBackground from '../InteractiveBackground';
+
+const phrases = [
+    {
+        word1: "access",
+        word2: "revolutionized",
+    },
+    {
+        word1: "inspection",
+        word2: "reimagined",
+    },
+    {
+        word1: "welding",
+        word2: "reinvented",
+    },
+    {
+        word1: "painting",
+        word2: "redefined",
+    }
+];
 
 function HeroPhrases() {
     const [index, setIndex] = useState(0);
@@ -62,20 +83,35 @@ function HeroPhrases() {
         </span>
     );
 }
+
 const Hero = () => {
+    const containerRef = useRef<HTMLElement>(null);
+
+    useGSAP(() => {
+        // Hero elements entrance animation
+        gsap.fromTo(
+            ".hero-element",
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 1.2, stagger: 0.2, ease: "power3.out" }
+        );
+    }, { scope: containerRef });
+
     return (
-        <section className="relative min-h-svh flex flex-col justify-center items-center text-center px-4 z-10 hero-section">
+        <section ref={containerRef} className="relative min-h-svh flex flex-col justify-center items-center text-center px-4 z-10 hero overflow-hidden">
+            <InteractiveBackground className="absolute inset-0 z-0 bg-black" />
+
             <div className="parallax-bg absolute top-1/4 left-1/4 w-75 md:w-150 h-75 md:h-150 bg-blue-600/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none" />
             <div className="parallax-bg absolute bottom-1/4 right-1/4 w-62.5 md:w-125 h-62.5 md:h-125 bg-purple-600/10 rounded-full blur-[70px] md:blur-[100px] pointer-events-none" />
 
-
-            <h1 className="hero-element text-4xl md:text-7xl lg:text-[110px] leading-none font-bold tracking-tighter mb-6 md:mb-10 max-w-6xl">
+            <h1 className="hero-element text-4xl md:text-7xl lg:text-[110px] leading-none font-bold tracking-tighter mb-6 md:mb-10 max-w-6xl relative z-10">
                 <HeroPhrases />
             </h1>
 
-            <div className="hero-element flex flex-wrap justify-center gap-4 mt-4 md:mt-8">
-                <Link href="/team">
-                    <Button className="rounded-full px-8 md:px-10 py-5 md:py-7 text-base md:text-xl font-semibold bg-white text-black hover:bg-zinc-200 transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+            <div className="hero-element flex flex-wrap justify-center gap-4 mt-4 md:mt-8 relative z-10">
+                <Link href="#team">
+                    <Button
+                        className="rounded-full px-8 md:px-10 py-5 md:py-7 text-base md:text-xl font-semibold bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-none"
+                    >
                         Meet the Team <ArrowRight className="ml-2 w-4 h-4 md:w-6 md:h-6" />
                     </Button>
                 </Link>
@@ -85,22 +121,3 @@ const Hero = () => {
 }
 
 export default Hero
-
-const phrases = [
-    {
-        word1: "access",
-        word2: "revolutionized",
-    },
-    {
-        word1: "inspection",
-        word2: "reimagined",
-    },
-    {
-        word1: "welding",
-        word2: "reinvented",
-    },
-    {
-        word1: "painting",
-        word2: "redefined",
-    }
-];

@@ -1,42 +1,329 @@
-import React from 'react'
+"use client";
 
-const Journey = () => {
-    return (
-        <section className="journey-section relative min-h-screen bg-zinc-950 z-10 overflow-hidden">
-            <div className="absolute top-20 left-12 md:left-24">
-                <span className="text-purple-500 font-mono text-sm tracking-[0.3em] uppercase mb-4 block">Our Evolution</span>
-                <h2 className="text-5xl md:text-8xl font-bold tracking-tighter text-white">Our Journey</h2>
-            </div>
+import { useTheme } from "@/lib/ThemeContext";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Building2, DollarSign, Globe, MoveRight, Rocket, ShieldCheck, Trophy, Zap } from "lucide-react";
+import React, { useRef } from "react";
 
-            <div className="journey-wrapper flex items-center h-full px-12 md:px-24 gap-12 md:gap-24 pt-40">
-                <div className="journey-item shrink-0 w-[80vw] md:w-150 h-[50vh] p-8 md:p-12 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-md flex flex-col justify-end">
-                    <div className="text-blue-400 font-mono text-xl mb-4 tracking-widest">EST. 2021</div>
-                    <h4 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Inception</h4>
-                    <p className="text-zinc-400 text-lg md:text-xl leading-relaxed">
-                        Founded with a vision to automate the most dangerous industrial tasks, conceptually proving the external actuation mechanism.
-                    </p>
-                </div>
-
-                <div className="journey-item shrink-0 w-[80vw] md:w-150 h-[50vh] p-8 md:p-12 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-md flex flex-col justify-end">
-                    <div className="text-purple-400 font-mono text-xl mb-4 tracking-widest">PHASE: ALPHA</div>
-                    <h4 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Prototype Alpha</h4>
-                    <p className="text-zinc-400 text-lg md:text-xl leading-relaxed">
-                        Successfully navigated a 3-inch pipe grid, outperforming traditional endoscopic tools by 300% in maneuverability.
-                    </p>
-                </div>
-
-                <div className="journey-item shrink-0 w-[80vw] md:w-150 h-[50vh] p-8 md:p-12 rounded-[3rem] bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-md flex flex-col justify-end">
-                    <div className="text-indigo-400 font-mono text-xl mb-4 tracking-widest">STATUS: SCALE</div>
-                    <h4 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Global Deployment</h4>
-                    <p className="text-white text-lg md:text-xl leading-relaxed opacity-80">
-                        Scaling production to meet demands from the aerospace, nuclear, and maritime industries globally. The next era of inspection begins.
-                    </p>
-                </div>
-
-                <div className="w-[20vw] shrink-0" /> {/* Spacer */}
-            </div>
-        </section>
-    )
+interface Milestone {
+    date: string;
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    position: "top" | "bottom";
 }
 
-export default Journey
+const milestones: Milestone[] = [
+    {
+        date: "OCT 2023",
+        title: "Global Technical Validation",
+        description: "Awarded Best Presentation at the International Astronautical Congress (IAC) for pioneering work on control systems for hyper-redundant robotic arms.",
+        icon: <Trophy className="w-8 h-8 text-yellow-500" />,
+        position: "top",
+    },
+    {
+        date: "NOV 2023",
+        title: "gradCapital Fellowship",
+        description: "Received the gradCapital Atomic Fellowship ($5,000) to initiate early-stage hardware development.",
+        icon: <DollarSign className="w-8 h-8 text-yellow-500" />,
+        position: "bottom",
+    },
+    {
+        date: "JAN 2024",
+        title: "Company Incorporation",
+        description: "Armatrix Automations Pvt. Ltd. officially incorporated, marking the transition from research to commercial entity.",
+        icon: <Building2 className="w-8 h-8 text-yellow-500" />,
+        position: "top",
+    },
+    {
+        date: "JUN 2024",
+        title: "Strategic Funding",
+        description: "Secured funding from gradCapital Venture Capital to accelerate R&D and team expansion.",
+        icon: <DollarSign className="w-8 h-8 text-yellow-500" />,
+        position: "bottom",
+    },
+    {
+        date: "NOV 2024",
+        title: "Prototype Alpha",
+        description: "Successfully tested the first functional prototype in a simulated high-radiation environment.",
+        icon: <Rocket className="w-8 h-8 text-yellow-500" />,
+        position: "top",
+    },
+    {
+        date: "MARCH 2025",
+        title: "Aerospace Partnership",
+        description: "Signed MoUs with major aerospace parts manufacturers for on-site inspection automation beta trials.",
+        icon: <Building2 className="w-8 h-8 text-yellow-500" />,
+        position: "bottom",
+    },
+    {
+        date: "JUNE 2025",
+        title: "Series A Round",
+        description: "Expanding production capacity and establishing global service hubs for specialized robotics maintenance.",
+        icon: <Zap className="w-8 h-8 text-yellow-500" />,
+        position: "top",
+    },
+    {
+        date: "OCT 2025",
+        title: "Nuclear Facility Deployment",
+        description: "First full-scale deployment of Armatrix arms in a decommissioned nuclear reactor for structural analysis.",
+        icon: <ShieldCheck className="w-8 h-8 text-yellow-500" />,
+        position: "bottom",
+    },
+    {
+        date: "NOV 2025",
+        title: "Global Market Entry",
+        description: "Scale-up for international shipments to APAC and EU regions, establishing Armatrix as the industry standard.",
+        icon: <Globe className="w-8 h-8 text-yellow-500" />,
+        position: "top",
+    },
+];
+
+const JourneyItem = ({ ms, index }: { ms: Milestone; index: number }) => {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const glowRef = useRef<HTMLDivElement>(null);
+    const iconRef = useRef<HTMLDivElement>(null);
+    const titleRef = useRef<HTMLHeadingElement>(null);
+    const indicatorRef = useRef<HTMLDivElement>(null);
+
+    const handleHover = () => {
+        gsap.to(cardRef.current, {
+            borderColor: "rgba(234, 179, 8, 0.4)",
+            y: ms.position === "top" ? -15 : 15,
+            scale: 1.02,
+            duration: 0.6,
+            ease: "power2.out",
+        });
+        gsap.to(glowRef.current, {
+            opacity: 0.3,
+            scale: 1.4,
+            duration: 1,
+            ease: "power2.out",
+        });
+        gsap.to(iconRef.current, {
+            scale: 1.15,
+            rotate: 8,
+            duration: 0.4,
+            ease: "power2.out",
+        });
+        gsap.to(titleRef.current, {
+            color: "#EAB308",
+            duration: 0.4,
+        });
+        gsap.to(indicatorRef.current, {
+            backgroundColor: "#EAB308",
+            opacity: 1,
+            scaleY: 1.2,
+            duration: 0.4,
+        });
+    };
+
+    const handleLeave = () => {
+        gsap.to(cardRef.current, {
+            borderColor: "rgba(234, 179, 8, 0.1)",
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: "power2.inOut",
+        });
+        gsap.to(glowRef.current, {
+            opacity: 0.1,
+            scale: 1,
+            duration: 1,
+            ease: "power2.inOut",
+        });
+        gsap.to(iconRef.current, {
+            scale: 1,
+            rotate: 0,
+            duration: 0.4,
+            ease: "power2.inOut",
+        });
+        gsap.to(titleRef.current, {
+            color: "#ffffff",
+            duration: 0.4,
+        });
+        gsap.to(indicatorRef.current, {
+            backgroundColor: "rgba(234, 179, 8, 0.2)",
+            opacity: 0.5,
+            scaleY: 1,
+            duration: 0.4,
+        });
+    };
+
+    return (
+        <div
+            className={`relative journey-item flex flex-col items-center shrink-0 w-[24rem] ${ms.position === "top" ? "mb-72" : "mt-72"
+                }`}
+        >
+            {/* Simple Vertical Indicator */}
+            <div
+                ref={indicatorRef}
+                className={`absolute w-0.5 bg-yellow-500/20 left-1/2 -translate-x-1/2 ${ms.position === "top" ? "top-full" : "bottom-full"
+                    } h-10 origin-${ms.position === 'top' ? 'top' : 'bottom'} transition-none`}
+            />
+
+            <div
+                ref={cardRef}
+                onMouseEnter={handleHover}
+                onMouseLeave={handleLeave}
+                className="journey-card w-full p-8 rounded-[2rem] bg-zinc-950 border border-yellow-500/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col cursor-default group"
+            >
+                <div ref={glowRef} className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-500/10 rounded-full blur-[80px] opacity-100 transition-opacity" />
+
+                <div className="flex justify-between items-start mb-6 z-10">
+                    <div className="text-yellow-500/40 font-mono text-sm tracking-widest font-bold group-hover:text-yellow-500/80 transition-colors">
+                        {ms.date}
+                    </div>
+                    <div ref={iconRef} className="p-3 bg-yellow-500/5 rounded-xl border border-yellow-500/20 group-hover:border-yellow-500/40 transition-colors">
+                        {ms.icon}
+                    </div>
+                </div>
+
+                <h4 ref={titleRef} className="text-white text-xl font-bold mb-3 tracking-tight z-10 transition-colors">
+                    {ms.title}
+                </h4>
+                <p className="text-zinc-500 text-sm leading-relaxed font-light z-10 group-hover:text-zinc-400 transition-colors">
+                    {ms.description}
+                </p>
+            </div>
+        </div>
+    );
+};
+
+const Journey = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const { setIsLightMode } = useTheme();
+    const isLight = useRef(false);
+
+    const goLight = () => {
+        if (isLight.current) return;
+
+        isLight.current = true;
+        setIsLightMode(true);
+
+        gsap.to(".main-container", {
+            backgroundColor: "#ffffff",
+            color: "#000000",
+            duration: 0.8,
+            ease: "power2.inOut",
+        });
+    };
+
+    const goDark = () => {
+        if (!isLight.current) return;
+
+        isLight.current = false;
+        setIsLightMode(false);
+
+        gsap.to(".main-container", {
+            backgroundColor: "#000000",
+            color: "#ffffff",
+            duration: 0.8,
+            ease: "power2.inOut",
+        });
+    };
+
+    useGSAP(() => {
+        const wrapper = wrapperRef.current;
+        if (!wrapper) return;
+
+        const totalScroll = wrapper.scrollWidth - window.innerWidth;
+
+        const scrollTween = gsap.to(wrapper, {
+            x: () => -totalScroll,
+            ease: "none",
+        });
+
+        ScrollTrigger.create({
+            animation: scrollTween,
+            trigger: sectionRef.current,
+            start: "top top",
+            end: () => `+=${totalScroll}`,
+            scrub: 0.1,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+
+            onUpdate: (self) => {
+                if (self.progress >= 0.99) {
+                    goLight();
+                } else {
+                    goDark();
+                }
+            }
+        });
+        ScrollTrigger.config({
+            ignoreMobileResize: true
+        });
+
+        // Progress bar
+        gsap.to(".journey-progress", {
+            width: "100%",
+            ease: "none",
+            scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top top",
+                end: () => `+=${totalScroll}`,
+                scrub: true,
+            },
+        });
+
+    }, { scope: sectionRef });
+
+    const handleArrowHover = () => {
+        gsap.to(".arrow-span", { opacity: 1, x: 5, duration: 0.3 });
+    };
+
+    const handleArrowLeave = () => {
+        gsap.to(".arrow-span", { opacity: 0.3, x: 0, duration: 0.3 });
+    };
+
+    return (
+        <section
+            id="journey"
+            ref={sectionRef}
+            className="journey relative h-screen z-10 overflow-hidden flex items-center w-full mx-auto"
+        >
+            <div className="absolute top-16 inset-x-0 z-20">
+                <div className="md:w-4/5 mx-auto max-w-7xl px-4 md:px-0">
+                    <div className="flex items-center gap-4 cursor-default">
+                        <span className="text-white/95 dark:text-zinc-800 font-bold opacity-30 select-none tracking-tighter arrow-span">
+                            <MoveRight />
+                        </span>
+                        <span className="font-mono text-xs tracking-[0.4em] uppercase">
+                            OUR JOURNEY
+                        </span>
+                    </div>
+                    <h2 className="text-4xl md:text-6xl font-bold mt-4 tracking-tighter">Milestones</h2>
+                </div>
+            </div>
+            <div
+                ref={wrapperRef}
+                className="journey-wrapper relative flex items-center h-full min-w-max px-[20vw]"
+            >
+                {/* Simplified Straight Timeline Line */}
+                <div className="absolute top-1/2 left-0 w-full h-0.5 bg-zinc-800 z-0">
+                    {/* Progress Overlay */}
+                    <div className="journey-progress absolute top-0 left-0 h-full w-0 bg-yellow-500/60 shadow-[0_0_20px_rgba(234,179,8,0.4)]" />
+                </div>
+
+                {/* Milestone Items */}
+                <div className="relative flex items-center gap-20 md:gap-40">
+                    {milestones.map((ms, i) => (
+                        <div key={i} className="shrink-0">
+                            <JourneyItem ms={ms} index={i} />
+                        </div>
+                    ))}
+
+                    {/* Spacer for end scroll */}
+                    <div className="w-[5vw] shrink-0" />
+                </div>
+            </div>
+        </section>
+    );
+};
+
+export default Journey;

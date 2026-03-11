@@ -114,7 +114,7 @@ export function CustomCursor() {
                         ref={(el) => {
                             trailRefs.current[i] = el;
                         }}
-                        className="absolute top-0 left-0 w-8 h-8 rounded-full bg-white/10 pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                        className="absolute top-0 left-0 w-12 h-12 rounded-full bg-white/10 pointer-events-none -translate-x-1/2 -translate-y-1/2"
                         style={{
                             scale: 1 - (i * 0.05),
                             opacity: 0.2 - (i * 0.015),
@@ -126,17 +126,17 @@ export function CustomCursor() {
                 {/* Main Outer Cursor Ring */}
                 <div
                     ref={cursorRef}
-                    className="absolute top-0 left-0 w-12 h-12 border border-white/20 rounded-full pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2 z-10000 backdrop-blur-[1px]"
+                    className="absolute top-0 left-0 w-8 h-8 border border-white/20 rounded-full pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2 z-10000 backdrop-blur-[1px]"
                 >
                     {isHovering && (
-                        <ArrowUpRight className="w-4 h-4 text-black opacity-100 transition-opacity duration-300 pointer-events-none" />
+                        <ArrowUpRight className="w-4 h-4 text-black pointer-events-none" />
                     )}
                 </div>
 
                 {/* Inner Dot */}
                 <div
                     ref={dotRef}
-                    className="absolute top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2 z-10001"
+                    className="absolute top-0 left-0 w-6 h-6 bg-white rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2 z-10001"
                 />
             </div>
         </div>

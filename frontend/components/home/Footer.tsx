@@ -1,78 +1,117 @@
 "use client";
 
-import { Github, Linkedin, Twitter, Waves } from "lucide-react";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
 import Link from "next/link";
+import React, { useEffect, useRef } from "react";
 
-export default function Footer() {
+gsap.registerPlugin(ScrollTrigger);
+const Footer = () => {
+    const footerRef = useRef<HTMLElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    useGSAP(() => {
+
+        gsap.fromTo(
+            contentRef.current,
+            { opacity: 0, y: 20 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 1.5,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: footerRef.current,
+                    start: "top 90%",
+                },
+            }
+        );
+    });
+
+    const handleLinkHover = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        gsap.to(e.currentTarget, { color: "#2563eb", x: 5, duration: 0.3 });
+    };
+
+    const handleLinkLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        gsap.to(e.currentTarget, { color: "currentColor", x: 0, duration: 0.3 });
+    };
+
     return (
-        <footer className="relative py-20 px-4 bg-zinc-50 border-t border-zinc-200 transition-colors duration-1000">
-            <div className="max-w-7xl mx-auto">
+        <footer
+            ref={footerRef}
+            className="border-t border-current/10 bg-transparent py-20 px-8 md:px-24 transition-colors duration-1000"
+        >
+            <div ref={contentRef} className="max-w-7xl mx-auto opacity-0">
+                {/* Top: Logo + Links */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-                    <div className="col-span-1 md:col-span-1">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Waves className="w-8 h-8 text-blue-600" />
-                            <span className="text-2xl font-bold tracking-tighter text-black">ARMATRIX</span>
-                        </div>
-                        <p className="text-zinc-500 leading-relaxed mb-6">
-                            Engineering the next generation of robotic solutions for the world's most challenging environments.
+                    <div className="col-span-1 md:col-span-2">
+                        <Image
+                            src="https://armatrix.in/assets/images/logo/registered_logo.png"
+                            alt="Logo"
+                            width={140}
+                            height={140}
+                            className="mb-8 transition-all invert dark:invert-0"
+                        />
+                        <p className="text-lg max-w-sm leading-relaxed opacity-50">
+                            Building the future of hyper-redundant robotics for the world's most challenging environments.
                         </p>
-                        <div className="flex gap-4">
-                            <Link href="#" className="p-2 rounded-lg bg-zinc-100 text-zinc-600 hover:bg-blue-100 hover:text-blue-600 transition-colors">
-                                <Twitter className="w-5 h-5" />
-                            </Link>
-                            <Link href="#" className="p-2 rounded-lg bg-zinc-100 text-zinc-600 hover:bg-blue-100 hover:text-blue-600 transition-colors">
-                                <Linkedin className="w-5 h-5" />
-                            </Link>
-                            <Link href="#" className="p-2 rounded-lg bg-zinc-100 text-zinc-600 hover:bg-blue-100 hover:text-blue-600 transition-colors">
-                                <Github className="w-5 h-5" />
-                            </Link>
-                        </div>
                     </div>
 
-                    <div>
-                        <h4 className="font-bold text-black mb-6 uppercase tracking-widest text-sm font-mono">Company</h4>
-                        <ul className="space-y-4">
-                            <li><Link href="#" className="text-zinc-500 hover:text-blue-600 transition-colors">About Us</Link></li>
-                            <li><Link href="/team" className="text-zinc-500 hover:text-blue-600 transition-colors">Career</Link></li>
-                            <li><Link href="#" className="text-zinc-500 hover:text-blue-600 transition-colors">Press Kit</Link></li>
-                        </ul>
+                    <div className="flex flex-col gap-4">
+                        <h4 className="font-mono text-xs uppercase tracking-[0.3em] mb-4 opacity-40">
+                            Company
+                        </h4>
+                        {["Media Kit", "Privacy Policy", "Terms of Service"].map((link) => (
+                            <Link
+                                key={link}
+                                href="#"
+                                onMouseEnter={handleLinkHover}
+                                onMouseLeave={handleLinkLeave}
+                                className="opacity-40 text-sm tracking-wide transition-all no-underline hover:opacity-100"
+                            >
+                                {link}
+                            </Link>
+                        ))}
                     </div>
 
-                    <div>
-                        <h4 className="font-bold text-black mb-6 uppercase tracking-widest text-sm font-mono">Technology</h4>
-                        <ul className="space-y-4">
-                            <li><Link href="#" className="text-zinc-500 hover:text-blue-600 transition-colors">Robotic Arms</Link></li>
-                            <li><Link href="#" className="text-zinc-500 hover:text-blue-600 transition-colors">AI Perception</Link></li>
-                            <li><Link href="#" className="text-zinc-500 hover:text-blue-600 transition-colors">Hazard Systems</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-black mb-6 uppercase tracking-widest text-sm font-mono">Newsletter</h4>
-                        <p className="text-zinc-500 mb-6 text-sm">Stay updated with our latest breakthroughs.</p>
-                        <div className="flex gap-2">
-                            <input
-                                type="email"
-                                placeholder="Email address"
-                                className="flex-1 px-4 py-3 rounded-xl bg-white border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-black text-sm transition-all"
-                            />
-                            <button className="px-5 py-3 rounded-xl bg-black text-white font-bold text-sm hover:bg-zinc-800 transition-all">
-                                Join
-                            </button>
-                        </div>
+                    <div className="flex flex-col gap-4">
+                        <h4 className="font-mono text-xs uppercase tracking-[0.3em] mb-4 opacity-40">
+                            Social
+                        </h4>
+                        {["LinkedIn", "Twitter", "Instagram"].map((link) => (
+                            <Link
+                                key={link}
+                                href="#"
+                                onMouseEnter={handleLinkHover}
+                                onMouseLeave={handleLinkLeave}
+                                className="opacity-40 text-sm tracking-wide transition-all no-underline hover:opacity-100"
+                            >
+                                {link}
+                            </Link>
+                        ))}
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-zinc-200 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-zinc-400 text-sm">
-                        © {new Date().getFullYear()} Armatrix Robotics Inc. All rights reserved.
-                    </p>
-                    <div className="flex gap-8 text-sm text-zinc-400">
-                        <Link href="#" className="hover:text-black transition-colors">Privacy Policy</Link>
-                        <Link href="#" className="hover:text-black transition-colors">Terms of Service</Link>
+                {/* Separator */}
+                <div className="w-full h-px bg-current opacity-10 mb-10" />
+
+                {/* Bottom Bar */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="text-sm font-light opacity-40 flex items-center gap-2">
+                        <span className="inline-flex items-center justify-center w-5 h-5 border border-current/30 rounded-full text-[10px]">
+                            ©
+                        </span>
+                        Armatrix 2026 All Rights Reserved
+                    </div>
+                    <div className="font-mono text-xs uppercase tracking-widest opacity-30">
+                        Products under development, currently not for sale
                     </div>
                 </div>
             </div>
         </footer>
     );
-}
+};
+
+export default Footer;

@@ -127,13 +127,44 @@
     @apply font-sans;
   }
 }
+@property --fill-progress {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
 
-.snake-title,
-.snake-desc {
-  color: transparent;
-  background: linear-gradient(90deg, white 50%, gray 50%);
-  background-size: 200% 100%;
-  background-position: 100% 0;
+.title-char {
+  background: linear-gradient(
+    to right,
+    #ffc864 0%,
+    #96b464 calc(var(--fill-progress) * 0.7),
+    #96b464 var(--fill-progress),
+    rgba(255,255,255,0.3) var(--fill-progress),
+    rgba(255,255,255,0.3) 100%
+  );
+
   -webkit-background-clip: text;
   background-clip: text;
+  color: transparent;
+}
+
+.desc-char {
+  background: linear-gradient(
+    to right,
+    white var(--fill-progress),
+    rgba(255,255,255,0.25) var(--fill-progress)
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Fix Scroll Snap conflicts with GSAP */
+.no-snap {
+  scroll-snap-type: none !important;
+}
+
+.snap-section {
+  scroll-snap-align: start;
 }

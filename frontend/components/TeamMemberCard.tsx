@@ -2,7 +2,7 @@
 
 import { TeamMember } from "@/lib/types";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Github, Linkedin, Pencil, Trash2 } from "lucide-react";
+import { Github, Linkedin, Pencil, Trash2, UserMinus, UserPen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TeamMemberCardProps {
@@ -13,52 +13,51 @@ interface TeamMemberCardProps {
 
 export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps) {
     return (
-        <Card className="team-card relative overflow-hidden bg-black/40 border-white/10 backdrop-blur-md transition-all duration-300 hover:border-white/30 group will-change-transform">
+        <Card className="team-card relative overflow-hidden bg-zinc-950/50 border-white/5 backdrop-blur-2xl transition-all duration-500 hover:border-blue-500/30 group will-change-transform shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.1)]">
             <CardHeader className="p-0">
-                <div className="w-full h-48 overflow-hidden relative">
-                    {/* Fallback pattern if image is missing, but typically we want the src */}
-                    <div className="absolute inset-0 bg-linear-to-tr from-gray-900 to-gray-800" />
+                <div className="w-full h-56 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-zinc-900" />
                     {member.photo_url && (
                         <img
                             src={member.photo_url}
                             alt={member.name}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 relative z-10"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 relative z-10 brightness-[0.8] grayscale-[0.2] group-hover:grayscale-0 group-hover:brightness-100"
                             onError={(e) => {
                                 e.currentTarget.style.display = 'none';
                             }}
                         />
                     )}
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent z-20" />
+                    <div className="absolute inset-0 bg-linear-to-t from-zinc-950 via-zinc-950/20 to-transparent z-20" />
                 </div>
             </CardHeader>
-            <CardContent className="p-6 relative z-30">
-                <h3 className="text-xl font-bold text-white mb-1 tracking-tight">{member.name}</h3>
-                <p className="text-sm text-blue-400 font-medium mb-4">{member.role}</p>
-                <p className="text-gray-300 text-sm line-clamp-3">{member.bio}</p>
+            <CardContent className="p-8 relative z-30">
+                <h3 className="text-2xl font-bold text-white mb-2 tracking-tight group-hover:text-blue-400 transition-colors">{member.name}</h3>
+                <p className="text-sm text-blue-500/80 font-mono tracking-widest uppercase mb-4">{member.role}</p>
+                <p className="text-zinc-500 text-sm leading-relaxed line-clamp-3 group-hover:text-zinc-400 transition-colors">{member.bio}</p>
             </CardContent>
-            <CardFooter className="p-6 pt-0 flex items-center justify-between relative z-30">
-                <div className="flex gap-3">
+            <CardFooter className="px-8 pb-8 pt-0 flex items-center justify-between relative z-30">
+                <div className="flex gap-4">
                     {member.linkedin_url && (
-                        <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-500 transition-colors">
+                        <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-blue-500 transition-all hover:scale-110">
                             <Linkedin className="w-5 h-5" />
                         </a>
                     )}
                     {member.github_url && (
-                        <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                        <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-all hover:scale-110">
                             <Github className="w-5 h-5" />
                         </a>
                     )}
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8 bg-black/50 border-white/10 hover:bg-white/10" onClick={() => onEdit(member)}>
-                        <Pencil className="w-4 h-4 text-white" />
+                    <Button variant="outline" size="icon" className="h-9 w-9 bg-zinc-900/50 border-white/5 hover:bg-white/10 hover:border-white/20 transition-all" onClick={() => onEdit(member)}>
+                        <UserPen className="w-4 h-4 text-zinc-400 group-hover:text-white" />
                     </Button>
-                    <Button variant="destructive" size="icon" className="h-8 w-8" onClick={() => onDelete(member.id)}>
-                        <Trash2 className="w-4 h-4" />
+                    <Button variant="destructive" size="icon" className="h-9 w-9 backdrop-blur-sm " onClick={() => onDelete(member.id)}>
+                        <UserMinus className="w-4 h-4" />
                     </Button>
                 </div>
             </CardFooter>
-            <div className="absolute inset-0 z-0 bg-linear-to-br from-blue-500/0 via-purple-500/0 to-white/0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none" />
+            <div className="absolute inset-0 z-0 bg-linear-to-br from-blue-500/0 via-transparent to-blue-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-700 pointer-events-none" />
         </Card>
     );
 }

@@ -50,6 +50,15 @@ export function AddMemberDialog({
     onSave,
 }: AddMemberDialogProps) {
 
+    const defaultValues: FormValues = {
+        name: "",
+        role: "",
+        bio: "",
+        photo_url: "",
+        linkedin_url: "",
+        github_url: "",
+    };
+
     const {
         register,
         handleSubmit,
@@ -57,24 +66,28 @@ export function AddMemberDialog({
         formState: { errors, isSubmitting },
     } = useForm<FormValues>({
         resolver: zodResolver(teamMemberSchema),
-        defaultValues: {
-            name: "",
-            role: "",
-            bio: "",
-            photo_url: "",
-            linkedin_url: "",
-            github_url: "",
-        },
+        defaultValues,
     });
 
     useEffect(() => {
         if (memberToEdit) {
-            reset(memberToEdit);
+            reset({
+                name: memberToEdit.name || "",
+                role: memberToEdit.role || "",
+                bio: memberToEdit.bio || "",
+                photo_url: memberToEdit.photo_url || "",
+                linkedin_url: memberToEdit.linkedin_url || "",
+                github_url: memberToEdit.github_url || "",
+            });
         } else {
-            reset();
+            reset(defaultValues);
         }
-    }, [memberToEdit, open, reset]);
+    }, [memberToEdit, reset]);
 
+    const handleCancel = () => {
+        reset(defaultValues);
+        onOpenChange(false);
+    };
     const onSubmit = async (data: FormValues) => {
         await onSave(data, memberToEdit?.id);
         onOpenChange(false);
@@ -172,18 +185,22 @@ export function AddMemberDialog({
                             />
                         </InputGroup>
                     </div>
+                    <div className="flex gap-2">
 
-                    <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="mt-2 bg-white text-black hover:bg-zinc-200"
-                    >
-                        {isSubmitting
-                            ? "Saving..."
-                            : memberToEdit
-                                ? "Save Changes"
-                                : "Add Member"}
-                    </Button>
+
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="mt-2 bg-white text-black hover:bg-zinc-200"
+                        >
+                            {isSubmitting
+                                ? "Saving..."
+                                : memberToEdit
+                                    ? "Save Changes"
+                                    : "Add Member"}
+                        </Button>
+                        <Button disabled={isSubmitting} variant="outline" type="button" className="mt-2 text-white hover:bg-zinc-200" onClick={() => handleCancel()}>Cancel</Button>
+                    </div>
 
                 </form>
             </DialogContent>
