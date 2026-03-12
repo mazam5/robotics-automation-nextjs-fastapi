@@ -1,9 +1,9 @@
 "use client";
 
-import { TeamMember } from "@/lib/types";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Github, Linkedin, Pencil, Trash2, UserMinus, UserPen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { TeamMember } from "@/lib/types";
+import { Github, Linkedin, UserMinus, UserPen } from "lucide-react";
 
 interface TeamMemberCardProps {
     member: TeamMember;

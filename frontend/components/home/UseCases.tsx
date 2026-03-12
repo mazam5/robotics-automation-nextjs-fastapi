@@ -2,7 +2,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MoveRight } from "lucide-react";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -38,10 +38,161 @@ const cards: CardData[] = [
     },
 ];
 
-// Card dimensions — tweak these two values to taste
-const CARD_HEIGHT_VH = 72;   // card height as % of viewport
-const CARD_GAP_PX = 20;    // visible gap between stacked cards (px)
+const CARD_HEIGHT_VH = 72;
+const CARD_GAP_PX = 20;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Hook: returns true when window width ≥ breakpoint (default 768px / "md")
+// ─────────────────────────────────────────────────────────────────────────────
+function useIsDesktop(breakpoint = 768) {
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        const mql = window.matchMedia(`(min-width: ${breakpoint}px)`);
+        const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+        setIsDesktop(mql.matches);
+        mql.addEventListener("change", handler);
+        return () => mql.removeEventListener("change", handler);
+    }, [breakpoint]);
+
+    return isDesktop;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UseCaseCard
+// ─────────────────────────────────────────────────────────────────────────────
+interface UseCaseCardProps extends CardData {
+    stackIndex: number;
+    total: number;
+    cardHeightVh: number;
+    cardGapPx: number;
+}
+
+const UseCaseCard: React.FC<UseCaseCardProps> = ({
+    index,
+    title,
+    video,
+    accentColor,
+    overlayColor,
+    stackIndex,
+    cardHeightVh,
+    cardGapPx,
+}) => {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const isDesktop = useIsDesktop();
+
+    const handleMouseEnter = () => {
+        gsap.to(videoRef.current, { scale: 1.05, duration: 1.5, ease: "power2.out" });
+        gsap.to(contentRef.current, { x: 10, duration: 0.5, ease: "power2.out" });
+    };
+
+    const handleMouseLeave = () => {
+        gsap.to(videoRef.current, { scale: 1, duration: 1.5, ease: "power2.inOut" });
+        gsap.to(contentRef.current, { x: 0, duration: 0.5, ease: "power2.inOut" });
+    };
+
+    /*
+     * Inline styles are split by breakpoint so mobile styles never get
+     * clobbered by the desktop object (Tailwind can't toggle inline styles).
+     *
+     * Desktop: absolute positioning inside the 100 vh stage — GSAP takes over.
+     * Mobile:  natural flow with a clamped height.
+     */
+    const cardStyle: React.CSSProperties = isDesktop
+        ? {
+            position: "absolute",
+            height: `${cardHeightVh}vh`,
+            top: `calc(50vh - ${cardHeightVh / 2}vh + ${stackIndex === 0 ? 0 : cardGapPx}px)`,
+            left: 0,
+            right: 0,
+            zIndex: stackIndex + 1,
+        }
+        : {
+            position: "relative",
+            // Tall on phones/tablets without exceeding the viewport
+            height: "clamp(280px, 60vw, 440px)",
+        };
+
+    return (
+        <div
+            ref={cardRef}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className="
+                stacked-card
+                overflow-hidden
+                rounded-[1.75rem] sm:rounded-[2.25rem] md:rounded-[3rem]
+                bg-zinc-950
+                border border-white/10
+                shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)]
+                flex flex-col
+                mb-4 sm:mb-6 md:mb-0
+            "
+            style={cardStyle}
+        >
+            {/* ── Background video ── */}
+            <div className="absolute inset-0 z-0">
+                <video
+                    ref={videoRef}
+                    className="
+                        absolute inset-0 w-full h-full object-cover
+                        brightness-50 grayscale hover:grayscale-0
+                        transition-[filter] duration-1000
+                    "
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                >
+                    <source src={video} type="video/mp4" />
+                </video>
+
+                <div className={`absolute inset-0 ${overlayColor} mix-blend-overlay opacity-50`} />
+
+                {/* Slightly denser vignette on mobile for legibility */}
+                <div className="absolute inset-0 bg-linear-to-t from-black via-black/55 to-transparent md:via-black/40" />
+            </div>
+
+            {/* ── Content ── */}
+            <div
+                ref={contentRef}
+                className="
+                    relative z-10 mt-auto
+                    p-5 sm:p-7 md:p-10 lg:p-12
+                    w-full flex justify-between items-end
+                "
+            >
+                <div>
+                    <span
+                        className={`
+                            ${accentColor}
+                            text-sm sm:text-base md:text-xl lg:text-2xl
+                            tracking-widest mb-2 sm:mb-3
+                            block font-mono
+                        `}
+                    >
+                        {index}
+                    </span>
+
+                    <h3
+                        className="
+                            font-bold tracking-tighter text-white leading-none
+                            text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl
+                        "
+                    >
+                        {title}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UseCases (parent)
+// ─────────────────────────────────────────────────────────────────────────────
 const UseCases: React.FC = () => {
     const containerRef = useRef<HTMLElement>(null);
 
@@ -50,8 +201,6 @@ const UseCases: React.FC = () => {
 
         mm.add("(min-width: 768px)", () => {
             const cardEls = gsap.utils.toArray<HTMLElement>(".stacked-card");
-
-            // Total scroll distance: one "snap" step per card transition
             const snapSteps = cardEls.length - 1;
 
             const tl = gsap.timeline({
@@ -59,12 +208,12 @@ const UseCases: React.FC = () => {
                     trigger: containerRef.current,
                     start: "top top",
                     end: `+=${snapSteps * 100}%`,
-                    scrub: 0.6,          // slightly smoothed for snap feel
+                    scrub: 0.6,
                     pin: true,
                     anticipatePin: 1,
                     invalidateOnRefresh: true,
                     snap: {
-                        snapTo: 1 / snapSteps,   // snap to each card boundary
+                        snapTo: 1 / snapSteps,
                         duration: { min: 0.3, max: 0.6 },
                         ease: "power2.inOut",
                         delay: 0.05,
@@ -72,38 +221,27 @@ const UseCases: React.FC = () => {
                 },
             });
 
-            cardEls.forEach((card, index) => {
-                if (index === 0) return;
+            cardEls.forEach((card, i) => {
+                if (i === 0) return;
+                const prev = cardEls[i - 1];
 
-                const prevCard = cardEls[index - 1];
-
-                // Slide new card up from below (accounting for gap offset)
                 tl.fromTo(
                     card,
-                    { yPercent: 105 },          // slightly more than 100 so gap is visible
+                    { yPercent: 105 },
                     { yPercent: 0, ease: "none", duration: 1 },
-                    index - 1
+                    i - 1
                 );
 
-                // Push previous card back + fade
                 tl.to(
-                    prevCard,
-                    {
-                        scale: 0.88,
-                        opacity: 0.35,
-                        filter: "blur(5px)",
-                        ease: "none",
-                        duration: 1,
-                    },
-                    index - 1
+                    prev,
+                    { scale: 0.88, opacity: 0.35, filter: "blur(5px)", ease: "none", duration: 1 },
+                    i - 1
                 );
             });
         });
 
         mm.add("(max-width: 767px)", () => {
-            const cardEls = gsap.utils.toArray(".stacked-card");
-
-            cardEls.forEach((card: any) => {
+            gsap.utils.toArray<HTMLElement>(".stacked-card").forEach((card) => {
                 gsap.fromTo(
                     card,
                     { y: 40, opacity: 0 },
@@ -129,37 +267,37 @@ const UseCases: React.FC = () => {
         <section
             ref={containerRef}
             id="use-cases"
-            className="cards-section md:w-4/5 mx-auto relative bg-black z-10 w-full overflow-visible md:overflow-visible"
+            className="
+                cards-section relative z-10 bg-black
+                w-full md:w-4/5 mx-auto
+                overflow-visible
+            "
         >
+            {/* ── Section label ── */}
             <div className="max-w-7xl mx-auto w-full px-4 md:px-0">
-                {/* Mobile heading */}
-                <div className="relative z-10 text-center pt-10 pb-6 md:hidden">
-                    <span className="text-white/95 font-mono text-sm tracking-[0.3em] uppercase">
-                        Use Cases
+                <div className="flex items-center gap-3 sm:gap-4 cursor-default mt-6 md:mt-10">
+                    <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter">
+                        <MoveRight className="w-4 h-4 sm:w-5 sm:h-5" />
                     </span>
-                </div>
-                <div className="flex items-center gap-4 cursor-default mt-4 md:mt-10">
-                    <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter arrow-span">
-                        <MoveRight />
-                    </span>
-                    <span className="font-mono text-xs tracking-[0.4em] uppercase">
+                    <span className="font-mono text-[10px] sm:text-xs tracking-[0.35em] sm:tracking-[0.4em] uppercase">
                         Use Cases
                     </span>
                 </div>
             </div>
 
             {/*
-              * The stage is full-viewport-height so the pin works correctly.
-              * Inside it, cards are centered vertically using flexbox.
-              */}
+             * Stage: full-viewport height on desktop so the pin + scrub works.
+             * On mobile, height is auto — cards flow and each has its own height.
+             */}
             <div className="cards-stage relative w-full h-auto md:h-screen overflow-hidden">
                 <div
                     className="
                         relative
-                        flex flex-col gap-8 px-4 py-12
-                        md:flex md:items-center md:justify-center
+                        flex flex-col
+                        gap-4 sm:gap-6 md:gap-0
+                        px-4 sm:px-6 py-8 sm:py-10 md:py-0
                         md:mx-20 lg:mx-24
-                        md:h-screen
+                        md:h-screen md:flex md:items-center md:justify-center
                     "
                 >
                     {cards.map((card, i) => (
@@ -179,103 +317,3 @@ const UseCases: React.FC = () => {
 };
 
 export default UseCases;
-
-interface UseCaseCardProps extends CardData {
-    stackIndex: number;
-    total: number;
-    cardHeightVh: number;
-    cardGapPx: number;
-}
-
-const UseCaseCard: React.FC<UseCaseCardProps> = ({
-    index,
-    title,
-    video,
-    accentColor,
-    overlayColor,
-    stackIndex,
-    cardHeightVh,
-    cardGapPx,
-}) => {
-    const cardRef = useRef<HTMLDivElement>(null);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
-
-    const handleMouseEnter = () => {
-        gsap.to(videoRef.current, { scale: 1.05, duration: 1.5, ease: "power2.out" });
-        gsap.to(contentRef.current, { x: 10, duration: 0.5, ease: "power2.out" });
-    };
-
-    const handleMouseLeave = () => {
-        gsap.to(videoRef.current, { scale: 1, duration: 1.5, ease: "power2.inOut" });
-        gsap.to(contentRef.current, { x: 0, duration: 0.5, ease: "power2.inOut" });
-    };
-
-    /*
-     * Desktop layout: cards are absolutely positioned, centred in the stage.
-     * We leave a small top offset so the edge of the card below peeks out
-     * (the "gap" illusion) before GSAP slides it fully into view.
-     *
-     * On mobile the cards just stack naturally in the flex column.
-     */
-    const desktopStyles: React.CSSProperties = {
-        // Height is a fraction of the viewport
-        height: `${cardHeightVh}vh`,
-        // Vertically centre the card in the 100vh stage
-        top: `calc(50vh - ${cardHeightVh / 2}vh + ${stackIndex === 0 ? 0 : cardGapPx}px)`,
-        left: 0,
-        right: 0,
-        zIndex: stackIndex + 1,
-    };
-
-    return (
-        <div
-            ref={cardRef}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            className="
-                stacked-card
-                relative overflow-hidden
-                rounded-[2.5rem] md:rounded-[3rem]
-                bg-zinc-950
-                border border-white/10
-                shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)]
-                flex flex-col
-                mb-10 md:mb-0
-                md:absolute
-            "
-            style={desktopStyles}
-        >
-            {/* Background video */}
-            <div className="absolute inset-0 z-0">
-                <video
-                    ref={videoRef}
-                    className="absolute inset-0 w-full h-full object-cover brightness-50 grayscale hover:grayscale-0 transition-[filter] duration-1000"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                >
-                    <source src={video} type="video/mp4" />
-                </video>
-                <div className={`absolute inset-0 ${overlayColor} mix-blend-overlay opacity-50`} />
-                <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-            </div>
-
-            {/* Content */}
-            <div
-                ref={contentRef}
-                className="relative z-10 mt-auto p-6 md:p-10 lg:p-12 w-full flex justify-between items-end"
-            >
-                <div>
-                    <span className={`${accentColor} text-xl md:text-2xl tracking-widest mb-3 block`}>
-                        {index}
-                    </span>
-                    <h3 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white">
-                        {title}
-                    </h3>
-                </div>
-            </div>
-        </div>
-    );
-};

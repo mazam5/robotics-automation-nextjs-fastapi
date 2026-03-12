@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // WebGL Fluid Simulation - ink-in-water effect reacting to mouse
 // Based on stable fluid simulation using velocity/density fields

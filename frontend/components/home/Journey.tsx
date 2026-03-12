@@ -247,8 +247,20 @@ const Journey = () => {
             anticipatePin: 1,
             invalidateOnRefresh: true,
 
+            onEnter: () => {
+                gsap.to(wrapper, { opacity: 1, scale: 1, duration: 1, ease: "power2.out" });
+            },
+            onLeaveBack: () => {
+                gsap.to(wrapper, { scale: 0.90, duration: 0.8, ease: "power2.in" });
+            },
+
             onUpdate: (self) => {
-                if (self.progress >= 0.99) {
+                // Smooth fade out at the very end
+                if (self.progress > 0.05) {
+                    gsap.to(wrapper, { opacity: 1, ease: "none", duration: 0.1 });
+                }
+
+                if (self.progress >= 0.9999999999) {
                     goLight();
                 } else {
                     goDark();

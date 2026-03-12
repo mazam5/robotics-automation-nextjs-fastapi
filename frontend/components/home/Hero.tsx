@@ -1,10 +1,10 @@
-import { ArrowRight } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { Button } from '../ui/button';
-import Link from 'next/link';
-import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import InteractiveBackground from '../InteractiveBackground';
+import { Button } from '../ui/button';
 
 const phrases = [
     {
@@ -66,7 +66,7 @@ function HeroPhrases() {
     }, [index]);
 
     return (
-        <span className="inline-flex gap-4 md:gap-16 text-white">
+        <span className="flex flex-col md:flex-row gap-4 md:gap-16 text-white">
             <span
                 ref={word1Ref}
                 className="text-5xl md:text-7xl tracking-tighter font-light"

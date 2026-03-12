@@ -3,12 +3,6 @@
 import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { TeamMemberCard } from '@/components/TeamMemberCard';
 import { Button } from '@/components/ui/button';
-import { api } from '@/lib/api';
-import { TeamMember, TeamMemberCreate, TeamMemberUpdate } from '@/lib/types';
-import { useGSAP } from '@gsap/react';
-import { gsap } from 'gsap';
-import { MoveRight, UserPlus } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 import {
     Carousel,
     CarouselContent,
@@ -16,8 +10,73 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import { api } from '@/lib/api';
+import { TeamMember, TeamMemberCreate, TeamMemberUpdate } from '@/lib/types';
+import { useGSAP } from '@gsap/react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MoveRight, UserPlus } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Embla (used by shadcn Carousel) calls preventDefault() on pointerdown to
+// handle drag detection. In production this swallows native <a> clicks.
+//
+// Fix: track pointer position on down; on pointerup, if the pointer barely
+// moved (< DRAG_THRESHOLD px) treat it as a tap and manually fire the link.
+// ─────────────────────────────────────────────────────────────────────────────
+const DRAG_THRESHOLD = 5; // px — movement below this = tap, not drag
+
+function useTapToClick(ref: React.RefObject<HTMLElement | null>) {
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+
+        let startX = 0;
+        let startY = 0;
+
+        const onPointerDown = (e: PointerEvent) => {
+            startX = e.clientX;
+            startY = e.clientY;
+        };
+
+        const onPointerUp = (e: PointerEvent) => {
+            const dx = Math.abs(e.clientX - startX);
+            const dy = Math.abs(e.clientY - startY);
+
+            // If pointer barely moved, find the nearest <a> and navigate
+            if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) {
+                const target = e.target as HTMLElement;
+                const anchor = target.closest("a");
+                if (anchor) {
+                    const href = anchor.getAttribute("href");
+                    if (href) {
+                        const isExternal =
+                            anchor.target === "_blank" ||
+                            href.startsWith("http") ||
+                            href.startsWith("//");
+
+                        if (isExternal) {
+                            window.open(href, "_blank", "noopener,noreferrer");
+                        } else {
+                            window.location.href = href;
+                        }
+                    }
+                }
+            }
+        };
+
+        el.addEventListener("pointerdown", onPointerDown);
+        el.addEventListener("pointerup", onPointerUp);
+
+        return () => {
+            el.removeEventListener("pointerdown", onPointerDown);
+            el.removeEventListener("pointerup", onPointerUp);
+        };
+    }, [ref]);
+}
 
 const Team = () => {
     const [members, setMembers] = useState<TeamMember[]>([]);
@@ -25,6 +84,11 @@ const Team = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [memberToEdit, setMemberToEdit] = useState<TeamMember | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const stickyRef = useRef<HTMLDivElement>(null);
+    const carouselRef = useRef<HTMLDivElement>(null);
+
+    // Apply the tap-to-click fix to the entire carousel container
+    useTapToClick(carouselRef);
 
     useEffect(() => {
         fetchMembers();
@@ -43,20 +107,69 @@ const Team = () => {
 
     useGSAP(() => {
         if (!loading && members.length > 0) {
-            // Text Header Animation
-            gsap.fromTo(
-                containerRef.current?.querySelectorAll(".team-header-element") || [],
-                { y: 60, opacity: 0, scale: 0.9, filter: "blur(10px)" },
-                {
-                    y: 0,
-                    opacity: 1,
-                    scale: 1,
-                    filter: "blur(0px)",
-                    stagger: 0.15,
-                    duration: 1.2,
-                    ease: "expo.out",
+            const ctx = gsap.context(() => {
+                ScrollTrigger.create({
+                    trigger: containerRef.current,
+                    start: "top top",
+                    end: "bottom bottom",
+                    pin: stickyRef.current,
+                    pinSpacing: false,
+                });
+
+                gsap.fromTo(
+                    ".team-header-element",
+                    { y: 60, opacity: 0, scale: 0.95, filter: "blur(8px)" },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        scale: 1,
+                        filter: "blur(0px)",
+                        stagger: 0.12,
+                        duration: 1.1,
+                        ease: "expo.out",
+                        scrollTrigger: {
+                            trigger: containerRef.current,
+                            start: "top 80%",
+                            toggleActions: "play none none reverse",
+                        },
+                    }
+                );
+
+                gsap.fromTo(
+                    ".scrub-text",
+                    { backgroundPosition: "100% 50%" },
+                    {
+                        backgroundPosition: "0% 50%",
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: containerRef.current,
+                            start: "top 60%",
+                            end: "25% top",
+                            scrub: 1.5,
+                        },
+                    }
+                );
+
+                if (carouselRef.current) {
+                    gsap.fromTo(
+                        carouselRef.current,
+                        { x: 80, opacity: 0 },
+                        {
+                            x: 0,
+                            opacity: 1,
+                            duration: 1,
+                            ease: "expo.out",
+                            scrollTrigger: {
+                                trigger: containerRef.current,
+                                start: "10% 70%",
+                                toggleActions: "play none none reverse",
+                            },
+                        }
+                    );
                 }
-            );
+            }, containerRef);
+
+            return () => ctx.revert();
         }
     }, { dependencies: [loading, members], scope: containerRef });
 
@@ -76,89 +189,107 @@ const Team = () => {
         }
     };
 
-    const openAddDialog = () => {
-        setMemberToEdit(null);
-        setDialogOpen(true);
-    };
-
-    const openEditDialog = (member: TeamMember) => {
-        setMemberToEdit(member);
-        setDialogOpen(true);
-    };
+    const openAddDialog = () => { setMemberToEdit(null); setDialogOpen(true); };
+    const openEditDialog = (member: TeamMember) => { setMemberToEdit(member); setDialogOpen(true); };
 
     return (
         <section
             id="team"
             ref={containerRef}
-            className="relative py-24 md:py-32 px-4 md:px-0 md:w-4/5 mx-auto bg-transparent transition-colors duration-1000 overflow-hidden"
+            className="relative min-h-[150vh] bg-transparent transition-colors duration-1000 w-full md:w-4/5 mx-auto"
         >
-            <div className="max-w-7xl mx-auto relative z-10 mt-20">
-                <div className="flex items-center gap-4 mb-8 cursor-default">
-                    <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter arrow-span">
-                        <MoveRight />
-                    </span>
-                    <span className="font-mono text-xs tracking-[0.4em] uppercase">
-                        Our Team
-                    </span>
-                </div>
+            <div
+                ref={stickyRef}
+                className="sticky top-0 h-screen w-full flex items-center overflow-hidden"
+            >
+                <div className="w-full max-w-7xl mx-auto px-4 md:px-0 relative z-10">
 
-                <header className="md:mb-12 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div className="max-w-2xl">
-                        <h1 className="team-header-element text-4xl md:text-6xl font-bold text-white mb-6 tracking-tighter">
-                            Meet the <br />
-                            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500">Armatrix</span> Team
-                        </h1>
-                        <p className="team-header-element text-zinc-600 text-lg md:text-2xl font-light leading-relaxed scrub-text bg-linear-to-r from-white via-white to-zinc-600 bg-clip-text bg-size-[200%_100%] bg-position-[100%]">
-                            We are a collective of visionaries, engineers, and designers building the future of robotics.
-                        </p>
+                    {/* ── Label row ── */}
+                    <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 cursor-default">
+                        <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter">
+                            <MoveRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </span>
+                        <span className="font-mono text-[10px] sm:text-xs tracking-[0.35em] sm:tracking-[0.4em] uppercase">
+                            Our Team
+                        </span>
                     </div>
-                    <Button
-                        onClick={openAddDialog}
-                        className="team-header-element bg-white text-black hover:bg-zinc-200 px-8 py-6 text-lg rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all shrink-0 font-medium"
-                    >
-                        <UserPlus className="w-5 h-5 mr-2" /> Add Member
-                    </Button>
-                </header>
 
-                {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="h-96 rounded-xl bg-white/5 animate-pulse" />
-                        ))}
-                    </div>
-                ) : members.length === 0 ? (
-                    <div className="text-center py-20 text-gray-400">
-                        <h3 className="text-2xl font-semibold text-white mb-2">No team members yet</h3>
-                        <p>Click the "Add Member" button to get started.</p>
-                    </div>
-                ) : (
-                    <Carousel
-                        opts={{
-                            align: "start",
-                            loop: false,
-                        }}
-                        className="w-full"
-                    >
-                        <div className="flex items-center justify-end gap-2 mb-4">
-                            <CarouselPrevious className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
-                            <CarouselNext className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
+                    {/* ── Header ── */}
+                    <header className="mb-4 sm:mb-6 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+                        <div className="max-w-2xl">
+                            <h1 className="team-header-element text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 tracking-tighter">
+                                Meet the <br />
+                                <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500">
+                                    Armatrix
+                                </span>{" "}
+                                Team
+                            </h1>
+                            <p
+                                className="team-header-element scrub-text text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed bg-linear-to-r from-white via-white to-zinc-600 bg-clip-text text-transparent"
+                                style={{ backgroundSize: "200% 100%", backgroundPosition: "100% 0%" }}
+                            >
+                                We are a collective of visionaries, engineers, and designers building the future of robotics.
+                            </p>
                         </div>
-                        <CarouselContent className="-ml-4">
-                            {members.map((member) => (
-                                <CarouselItem
-                                    key={member.id}
-                                    className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-                                >
-                                    <TeamMemberCard
-                                        member={member}
-                                        onEdit={openEditDialog}
-                                        onDelete={handleDelete}
-                                    />
-                                </CarouselItem>
+                        <Button
+                            onClick={openAddDialog}
+                            className="team-header-element bg-white text-black hover:bg-zinc-200 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all shrink-0 font-medium self-start md:self-auto"
+                        >
+                            <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /> Add Member
+                        </Button>
+                    </header>
+
+                    {/* ── Cards / Carousel ── */}
+                    {loading ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="h-64 sm:h-80 md:h-96 rounded-xl bg-white/5 animate-pulse" />
                             ))}
-                        </CarouselContent>
-                    </Carousel>
-                )}
+                        </div>
+                    ) : members.length === 0 ? (
+                        <div className="text-center py-12 sm:py-20 text-gray-400">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-white mb-2">No team members yet</h3>
+                            <p className="text-sm sm:text-base">Click the "Add Member" button to get started.</p>
+                        </div>
+                    ) : (
+                        <div ref={carouselRef}>
+                            <Carousel
+                                opts={{
+                                    align: "start",
+                                    loop: false,
+                                    /*
+                                     * Embla's drag detection works by measuring pointer
+                                     * movement. Setting a higher dragFree threshold means
+                                     * small taps are never classified as drags, so
+                                     * preventDefault() never fires and links work normally.
+                                     */
+                                    watchDrag: true,
+                                    dragFree: false,
+                                }}
+                                className="w-full"
+                            >
+                                <div className="flex items-center justify-end gap-2 mb-3 sm:mb-4">
+                                    <CarouselPrevious className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
+                                    <CarouselNext className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
+                                </div>
+                                <CarouselContent className="-ml-3 sm:-ml-4">
+                                    {members.map((member) => (
+                                        <CarouselItem
+                                            key={member.id}
+                                            className="pl-3 sm:pl-4 basis-4/5 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                                        >
+                                            <TeamMemberCard
+                                                member={member}
+                                                onEdit={openEditDialog}
+                                                onDelete={handleDelete}
+                                            />
+                                        </CarouselItem>
+                                    ))}
+                                </CarouselContent>
+                            </Carousel>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <AddMemberDialog

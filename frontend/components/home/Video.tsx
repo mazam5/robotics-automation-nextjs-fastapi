@@ -1,6 +1,6 @@
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-import React, { useRef } from 'react'
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { useRef } from 'react';
 
 const Video = () => {
     const containerRef = useRef<HTMLVideoElement>(null);
@@ -24,9 +24,11 @@ const Video = () => {
     }, { scope: containerRef });
 
     return (
-        <video ref={containerRef} autoPlay muted loop playsInline id="myVideo" className="w-full h-full object-cover">
-            <source src="/videos/landing-page-video.mp4" type="video/mp4" />
-        </video>
+        <section className="relative h-screen w-full flex items-center justify-center bg-black overflow-hidden">
+            <video ref={containerRef} autoPlay muted loop playsInline id="myVideo" className="w-full h-full object-cover">
+                <source src="/videos/landing-page-video.mp4" type="video/mp4" />
+            </video>
+        </section>
     )
 }
 
