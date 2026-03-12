@@ -8,19 +8,22 @@ const Section2 = () => {
     const descRef = useRef<HTMLParagraphElement>(null);
 
     useGSAP(() => {
-        // 1. Character-by-character fill animations
-        // TITLE animation
+        // TITLE animation - wrap chars inside word spans to preserve word-wrap
         const titleText = titleRef.current?.innerText || "";
         if (titleRef.current) {
             titleRef.current.innerHTML = titleText
-                .split("")
+                .split(" ")
                 .map(
-                    (char) =>
-                        `<span class="inline-block title-char" style="--fill-progress:0%">
-            ${char === " " ? "&nbsp;" : char}
-          </span>`
+                    (word) =>
+                        `<span class="inline-block">${word
+                            .split("")
+                            .map(
+                                (char) =>
+                                    `<span class="inline-block title-char" style="--fill-progress:0%">${char}</span>`
+                            )
+                            .join("")}</span>`
                 )
-                .join("");
+                .join(" "); // real space between word spans
 
             const chars = titleRef.current.querySelectorAll(".title-char");
 
@@ -36,18 +39,22 @@ const Section2 = () => {
             });
         }
 
-        // DESCRIPTION animation
+        // DESCRIPTION animation - same pattern
         const descText = descRef.current?.innerText || "";
         if (descRef.current) {
             descRef.current.innerHTML = descText
-                .split("")
+                .split(" ")
                 .map(
-                    (char) =>
-                        `<span class="inline-block desc-char" style="--fill-progress:0%">
-            ${char === " " ? "&nbsp;" : char}
-          </span>`
+                    (word) =>
+                        `<span class="inline-block">${word
+                            .split("")
+                            .map(
+                                (char) =>
+                                    `<span class="inline-block desc-char" style="--fill-progress:0%">${char}</span>`
+                            )
+                            .join("")}</span>`
                 )
-                .join("");
+                .join(" ");
 
             const chars = descRef.current.querySelectorAll(".desc-char");
 
@@ -62,7 +69,6 @@ const Section2 = () => {
                 },
             });
         }
-
     }, { scope: containerRef });
 
     return (
@@ -70,27 +76,24 @@ const Section2 = () => {
             ref={containerRef}
             className="relative min-h-screen flex flex-col justify-center px-4 md:px-20 z-10 py-20 md:py-40 bg-zinc-950/80 backdrop-blur-md border-y border-white/5 overflow-hidden"
         >
-            <div className="mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-26 relative">
+            <div className="mx-auto w-full relative">
 
                 <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-                <div className="relative z-10 md:w-2/3 w-full">
-                    <div className="md:w-[80%]">
-                        <h2
-                            ref={titleRef}
-                            className="text-lg md:text-3xl leading-[1.1] tracking-[0.2em] md:tracking-[0.3em] mb-4 md:mb-8"
-                        >
-                            Snake-like Robotic Arm
-                        </h2>
+                <div className="relative z-10 w-full max-w-5xl">
+                    <h2
+                        ref={titleRef}
+                        className="text-base md:text-2xl leading-[1.1] tracking-[0.2em] md:tracking-[0.3em] mb-4 md:mb-8 text-yellow-400/80"
+                    >
+                        Snake-like Robotic Arm
+                    </h2>
 
-                        <p
-                            ref={descRef}
-                            className="text-3xl sm:text-4xl md:text-7xl text-wrap wrap-normal font-bold leading-[1.1] tracking-wider"
-                        >
-                            Robotic arms designed  to inspect tight spaces within complex machinery
-                        </p>
-                    </div>
-
+                    <p
+                        ref={descRef}
+                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.2] tracking-wide"
+                    >
+                        Robotic arms designed to inspect tight spaces within complex machinery
+                    </p>
                 </div>
             </div>
         </section>
