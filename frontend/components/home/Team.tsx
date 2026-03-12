@@ -30,14 +30,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Embla (used by shadcn Carousel) calls preventDefault() on pointerdown to
-// handle drag detection. In production this swallows native <a> clicks.
-//
-// Fix: track pointer position on down; on pointerup, if the pointer barely
-// moved (< DRAG_THRESHOLD px) treat it as a tap and manually fire the link.
-// ─────────────────────────────────────────────────────────────────────────────
-const DRAG_THRESHOLD = 5; // px — movement below this = tap, not drag
+const DRAG_THRESHOLD = 5;
 
 function useTapToClick(ref: React.RefObject<HTMLElement | null>) {
     useEffect(() => {
@@ -118,12 +111,7 @@ const Team = () => {
         }
     };
 
-    // ── Refresh all ScrollTriggers after DOM settles ───────────────────────
-    // Called after any CRUD operation so the Journey horizontal-scroll pin
-    // and the Team sticky pin recalculate correctly.
     const refreshScrollTriggers = useCallback(() => {
-        // Use two rAFs to ensure React has committed the new DOM before
-        // ScrollTrigger measures element sizes.
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 ScrollTrigger.refresh(true);
@@ -206,17 +194,14 @@ const Team = () => {
             await api.createTeamMember(data as TeamMemberCreate);
         }
         await fetchMembers();
-        // Recalculate scroll positions after member list changes
         refreshScrollTriggers();
     };
 
-    // ── Delete flow: open confirmation dialog ──────────────────────────────
     const handleDeleteRequest = (member: TeamMember) => {
         setMemberToDelete(member);
         setDeleteDialogOpen(true);
     };
 
-    // ── Delete flow: confirmed ─────────────────────────────────────────────
     const handleDeleteConfirm = async () => {
         if (!memberToDelete) return;
         setIsDeleting(true);
@@ -240,16 +225,16 @@ const Team = () => {
         <section
             id="team"
             ref={containerRef}
-            className="relative bg-transparent transition-colors duration-1000 w-full md:w-4/5 mx-auto"
+            className="relative bg-transparent transition-colors duration-1000 w-full md:w-4/5 mx-auto md:min-h-[200vh]"
         >
             <div
                 ref={stickyRef}
-                className="sticky top-0 h-screen w-full flex items-center overflow-hidden"
+                className="sticky top-0 h-screen w-full flex flex-col justify-center pt-20 md:pt-24 pb-8"
             >
-                <div className="w-full max-w-7xl mx-auto px-4 md:px-0 relative z-10">
+                <div className="w-full max-w-7xl mx-auto px-4 md:px-6 relative z-10 flex flex-col gap-4 sm:gap-5 md:gap-6">
 
                     {/* ── Label row ── */}
-                    <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 cursor-default">
+                    <div className="flex items-center gap-3 sm:gap-4 cursor-default">
                         <span className="text-white/95 font-bold opacity-30 select-none tracking-tighter">
                             <MoveRight className="w-4 h-4 sm:w-5 sm:h-5" />
                         </span>
@@ -259,25 +244,26 @@ const Team = () => {
                     </div>
 
                     {/* ── Header ── */}
-                    <header className="mb-4 sm:mb-6 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
-                        <div className="max-w-2xl">
-                            <h1 className="team-header-element text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 tracking-tighter">
-                                Meet the <br />
+                    <header className="flex flex-row items-start justify-between gap-4 sm:gap-6">
+                        <div className="flex flex-col gap-3 sm:gap-4 max-w-2xl">
+                            <h1 className="team-header-element text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-tight">
+                                Meet the{" "}
                                 <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500">
                                     Armatrix
                                 </span>{" "}
                                 Team
                             </h1>
                             <p
-                                className="team-header-element scrub-text text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed bg-linear-to-r from-white via-white to-zinc-600 bg-clip-text text-transparent"
+                                className="team-header-element scrub-text text-sm sm:text-base md:text-lg lg:text-xl font-light leading-relaxed bg-linear-to-r from-white via-white to-zinc-600 bg-clip-text text-transparent"
                                 style={{ backgroundSize: "200% 100%", backgroundPosition: "100% 0%" }}
                             >
                                 We are a collective of visionaries, engineers, and designers building the future of robotics.
                             </p>
                         </div>
+
                         <Button
                             onClick={openAddDialog}
-                            className="team-header-element bg-white text-black hover:bg-zinc-200 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all shrink-0 font-medium self-start md:self-auto"
+                            className="team-header-element bg-white text-black hover:bg-zinc-200 px-5 sm:px-7 py-4 sm:py-5 text-sm sm:text-base rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all shrink-0 font-medium"
                         >
                             <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /> Add Member
                         </Button>
@@ -285,13 +271,13 @@ const Team = () => {
 
                     {/* ── Cards / Carousel ── */}
                     {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="h-64 sm:h-80 md:h-96 rounded-xl bg-white/5 animate-pulse" />
+                                <div key={i} className="h-56 sm:h-64 md:h-72 rounded-xl bg-white/5 animate-pulse" />
                             ))}
                         </div>
                     ) : members.length === 0 ? (
-                        <div className="text-center py-12 sm:py-20 text-gray-400">
+                        <div className="text-center py-12 sm:py-16 text-gray-400">
                             <h3 className="text-xl sm:text-2xl font-semibold text-white mb-2">No team members yet</h3>
                             <p className="text-sm sm:text-base">Click the "Add Member" button to get started.</p>
                         </div>
@@ -306,10 +292,12 @@ const Team = () => {
                                 }}
                                 className="w-full"
                             >
+
                                 <div className="flex items-center justify-end gap-2 mb-3 sm:mb-4">
                                     <CarouselPrevious className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
                                     <CarouselNext className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/20 text-white" />
                                 </div>
+
                                 <CarouselContent className="-ml-3 sm:-ml-4">
                                     {members.map((member) => (
                                         <CarouselItem

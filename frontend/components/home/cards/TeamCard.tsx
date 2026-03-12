@@ -35,7 +35,7 @@ const TeamCard = ({ member, onEdit, onDelete }: TeamCardProps) => {
                 <p className="text-sm text-blue-500/80 font-mono tracking-widest uppercase mb-4">{member.role}</p>
                 <p className="text-zinc-500 text-sm leading-relaxed line-clamp-3 group-hover:text-zinc-400 transition-colors">{member.bio}</p>
             </CardContent>
-            <CardFooter className="px-8 pb-8 pt-0 flex items-center justify-between relative z-30">
+            <CardFooter className="px-8 pt-0 flex items-center justify-between relative z-30">
                 <div className="flex gap-4">
                     {member.linkedin_url && (
                         <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-blue-500 transition-all hover:scale-110">
