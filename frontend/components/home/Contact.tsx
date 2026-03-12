@@ -8,7 +8,7 @@ import { useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function ContactSection() {
+const Contact = () => {
     const containerRef = useRef<HTMLElement>(null);
 
     useGSAP(() => {
@@ -132,12 +132,10 @@ export default function ContactSection() {
                             </div>
                         </div>
                     </div>
-
-                    {/* ── Right column (placeholder / future form slot) ── */}
-                    {/* Uncomment and fill in when a form or map embed is ready */}
-                    {/* <div className="hidden md:block"> ... </div> */}
                 </div>
             </div>
         </section>
     );
 }
+
+export default Contact;

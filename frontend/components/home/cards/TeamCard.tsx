@@ -5,13 +5,13 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { TeamMember } from "@/lib/types";
 import { Github, Linkedin, UserMinus, UserPen } from "lucide-react";
 
-interface TeamMemberCardProps {
+interface TeamCardProps {
     member: TeamMember;
     onEdit: (member: TeamMember) => void;
-    onDelete: (id: string) => void;
+    onDelete: (member: TeamMember) => void;
 }
 
-export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps) {
+const TeamCard = ({ member, onEdit, onDelete }: TeamCardProps) => {
     return (
         <Card className="team-card h-full flex flex-col relative overflow-hidden bg-zinc-950/50 border-white/5 backdrop-blur-2xl transition-all duration-500 hover:border-blue-500/30 group will-change-transform shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.1)]">
             <CardHeader className="p-0">
@@ -52,7 +52,7 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
                     <Button variant="outline" size="icon" className="h-9 w-9 bg-zinc-900/50 border-white/5 hover:bg-white/10 hover:border-white/20 transition-all" onClick={() => onEdit(member)}>
                         <UserPen className="w-4 h-4 text-zinc-400 group-hover:text-white" />
                     </Button>
-                    <Button variant="destructive" size="icon" className="h-9 w-9 backdrop-blur-sm " onClick={() => onDelete(member.id)}>
+                    <Button variant="destructive" size="icon" className="h-9 w-9 backdrop-blur-sm" onClick={() => onDelete(member)}>
                         <UserMinus className="w-4 h-4" />
                     </Button>
                 </div>
@@ -61,3 +61,5 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
         </Card>
     );
 }
+
+export default TeamCard;

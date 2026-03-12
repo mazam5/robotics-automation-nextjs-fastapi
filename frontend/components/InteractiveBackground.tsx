@@ -552,14 +552,14 @@ export default function InteractiveBackground({ className }: { className?: strin
     }
 
     const filtering = supportLinearFiltering ? gl.LINEAR : gl.NEAREST;
-    let simRes = getResolution(gl, config.SIM_RESOLUTION);
-    let dyeRes = getResolution(gl, config.DYE_RESOLUTION);
+    const simRes = getResolution(gl, config.SIM_RESOLUTION);
+    const dyeRes = getResolution(gl, config.DYE_RESOLUTION);
 
-    let density = createDoubleFBO(dyeRes.width, dyeRes.height, formatRGBA!.internalFormat, formatRGBA!.format, halfFloatTexType, filtering);
-    let velocity = createDoubleFBO(simRes.width, simRes.height, formatRG!.internalFormat, formatRG!.format, halfFloatTexType, filtering);
-    let divergence = createFBO(simRes.width, simRes.height, formatR!.internalFormat, formatR!.format, halfFloatTexType, gl.NEAREST);
-    let curl = createFBO(simRes.width, simRes.height, formatR!.internalFormat, formatR!.format, halfFloatTexType, gl.NEAREST);
-    let pressure = createDoubleFBO(simRes.width, simRes.height, formatR!.internalFormat, formatR!.format, halfFloatTexType, gl.NEAREST);
+    const density = createDoubleFBO(dyeRes.width, dyeRes.height, formatRGBA!.internalFormat, formatRGBA!.format, halfFloatTexType, filtering);
+    const velocity = createDoubleFBO(simRes.width, simRes.height, formatRG!.internalFormat, formatRG!.format, halfFloatTexType, filtering);
+    const divergence = createFBO(simRes.width, simRes.height, formatR!.internalFormat, formatR!.format, halfFloatTexType, gl.NEAREST);
+    const curl = createFBO(simRes.width, simRes.height, formatR!.internalFormat, formatR!.format, halfFloatTexType, gl.NEAREST);
+    const pressure = createDoubleFBO(simRes.width, simRes.height, formatR!.internalFormat, formatR!.format, halfFloatTexType, gl.NEAREST);
 
     // Pointers
     const pointers = [pointerPrototype()];

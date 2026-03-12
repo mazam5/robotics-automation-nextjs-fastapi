@@ -2,12 +2,10 @@
 
 import { useTheme } from "@/lib/ThemeContext";
 import { gsap } from "gsap";
-import { ArrowUpRight } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export function CustomCursor() {
-    const [isHovering, setIsHovering] = useState(false);
     const cursorRef = useRef<HTMLDivElement>(null);
     const dotRef = useRef<HTMLDivElement>(null);
     const trailRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -83,17 +81,6 @@ export function CustomCursor() {
         };
     }, [pathname]);
 
-    useEffect(() => {
-        if (isHovering) {
-            gsap.to(cursorRef.current, { scale: 3, backgroundColor: "rgba(255,255,255,1)", mixBlendMode: 'difference', duration: 0.3 });
-            gsap.to(dotRef.current, { scale: 0, duration: 0.2 });
-            gsap.to(trailRefs.current, { opacity: 0, duration: 0.2 });
-        } else {
-            gsap.to(cursorRef.current, { scale: 1, backgroundColor: "rgba(255, 255, 255, 0.05)", mixBlendMode: 'normal', duration: 0.3 });
-            gsap.to(dotRef.current, { scale: 1, duration: 0.2 });
-            gsap.to(trailRefs.current, { opacity: (i) => 0.1 - (i * 0.008), duration: 0.2 });
-        }
-    }, [isHovering]);
 
     return (
         <div className="hidden md:block">
@@ -129,11 +116,7 @@ export function CustomCursor() {
                 <div
                     ref={cursorRef}
                     className={`absolute top-0 left-0 w-8 h-8 border border-white/20 rounded-full pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2 z-10000 backdrop-blur-[1px] ${isLightMode ? "border-white/20" : "border-black/20"}`}
-                >
-                    {isHovering && (
-                        <ArrowUpRight className="w-4 h-4 text-black pointer-events-none" />
-                    )}
-                </div>
+                />
 
                 {/* Inner Dot */}
                 <div

@@ -8,22 +8,7 @@ const Section2 = () => {
     const descRef = useRef<HTMLParagraphElement>(null);
 
     useGSAP(() => {
-        // 1. Text reveal background animation (previously in page.tsx)
-        const snakeTexts = gsap.utils.toArray(".snake-title, .snake-desc");
-        snakeTexts.forEach((el: any) => {
-            gsap.to(el, {
-                backgroundPositionX: "0%",
-                ease: "none",
-                scrollTrigger: {
-                    trigger: el,
-                    start: "top 95%",
-                    end: "top 20%",
-                    scrub: true,
-                },
-            });
-        });
-
-        // 2. Character-by-character fill animations
+        // 1. Character-by-character fill animations
         // TITLE animation
         const titleText = titleRef.current?.innerText || "";
         if (titleRef.current) {

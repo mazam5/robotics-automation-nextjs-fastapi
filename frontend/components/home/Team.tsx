@@ -1,7 +1,17 @@
 "use client";
 
 import { AddMemberDialog } from '@/components/AddMemberDialog';
-import { TeamMemberCard } from '@/components/TeamMemberCard';
+import TeamCard from '@/components/home/cards/TeamCard';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import {
     Carousel,
@@ -46,7 +56,6 @@ function useTapToClick(ref: React.RefObject<HTMLElement | null>) {
             const dx = Math.abs(e.clientX - startX);
             const dy = Math.abs(e.clientY - startY);
 
-            // If pointer barely moved, find the nearest <a> and navigate
             if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) {
                 const target = e.target as HTMLElement;
                 const anchor = target.closest("a");
@@ -83,11 +92,15 @@ const Team = () => {
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [memberToEdit, setMemberToEdit] = useState<TeamMember | null>(null);
+    // ── Delete confirmation state ──────────────────────────────────────────
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [memberToDelete, setMemberToDelete] = useState<TeamMember | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const containerRef = useRef<HTMLDivElement>(null);
     const stickyRef = useRef<HTMLDivElement>(null);
     const carouselRef = useRef<HTMLDivElement>(null);
 
-    // Apply the tap-to-click fix to the entire carousel container
     useTapToClick(carouselRef);
 
     useEffect(() => {
@@ -104,6 +117,19 @@ const Team = () => {
             setLoading(false);
         }
     };
+
+    // ── Refresh all ScrollTriggers after DOM settles ───────────────────────
+    // Called after any CRUD operation so the Journey horizontal-scroll pin
+    // and the Team sticky pin recalculate correctly.
+    const refreshScrollTriggers = useCallback(() => {
+        // Use two rAFs to ensure React has committed the new DOM before
+        // ScrollTrigger measures element sizes.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                ScrollTrigger.refresh(true);
+            });
+        });
+    }, []);
 
     useGSAP(() => {
         if (!loading && members.length > 0) {
@@ -180,12 +206,30 @@ const Team = () => {
             await api.createTeamMember(data as TeamMemberCreate);
         }
         await fetchMembers();
+        // Recalculate scroll positions after member list changes
+        refreshScrollTriggers();
     };
 
-    const handleDelete = async (id: string) => {
-        if (confirm("Are you sure you want to delete this team member?")) {
-            await api.deleteTeamMember(id);
+    // ── Delete flow: open confirmation dialog ──────────────────────────────
+    const handleDeleteRequest = (member: TeamMember) => {
+        setMemberToDelete(member);
+        setDeleteDialogOpen(true);
+    };
+
+    // ── Delete flow: confirmed ─────────────────────────────────────────────
+    const handleDeleteConfirm = async () => {
+        if (!memberToDelete) return;
+        setIsDeleting(true);
+        try {
+            await api.deleteTeamMember(memberToDelete.id);
             await fetchMembers();
+            refreshScrollTriggers();
+        } catch (error) {
+            console.error("Failed to delete member:", error);
+        } finally {
+            setIsDeleting(false);
+            setDeleteDialogOpen(false);
+            setMemberToDelete(null);
         }
     };
 
@@ -196,7 +240,7 @@ const Team = () => {
         <section
             id="team"
             ref={containerRef}
-            className="relative min-h-[150vh] bg-transparent transition-colors duration-1000 w-full md:w-4/5 mx-auto"
+            className="relative bg-transparent transition-colors duration-1000 w-full md:w-4/5 mx-auto"
         >
             <div
                 ref={stickyRef}
@@ -257,12 +301,6 @@ const Team = () => {
                                 opts={{
                                     align: "start",
                                     loop: false,
-                                    /*
-                                     * Embla's drag detection works by measuring pointer
-                                     * movement. Setting a higher dragFree threshold means
-                                     * small taps are never classified as drags, so
-                                     * preventDefault() never fires and links work normally.
-                                     */
                                     watchDrag: true,
                                     dragFree: false,
                                 }}
@@ -278,10 +316,10 @@ const Team = () => {
                                             key={member.id}
                                             className="pl-3 sm:pl-4 basis-4/5 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                                         >
-                                            <TeamMemberCard
+                                            <TeamCard
                                                 member={member}
                                                 onEdit={openEditDialog}
-                                                onDelete={handleDelete}
+                                                onDelete={handleDeleteRequest}
                                             />
                                         </CarouselItem>
                                     ))}
@@ -292,12 +330,44 @@ const Team = () => {
                 </div>
             </div>
 
+            {/* ── Add / Edit dialog ── */}
             <AddMemberDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
                 memberToEdit={memberToEdit}
                 onSave={handleSave}
             />
+
+            {/* ── Delete confirmation dialog ── */}
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent className="bg-zinc-900 border-white/10 text-white">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Remove team member?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-400">
+                            This will permanently remove{" "}
+                            <span className="text-white font-medium">
+                                {memberToDelete?.name}
+                            </span>{" "}
+                            from the team. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            disabled={isDeleting}
+                            className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white"
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            disabled={isDeleting}
+                            onClick={handleDeleteConfirm}
+                            className="bg-red-600 hover:bg-red-700 text-white border-0"
+                        >
+                            {isDeleting ? "Removing…" : "Remove"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </section>
     );
 };

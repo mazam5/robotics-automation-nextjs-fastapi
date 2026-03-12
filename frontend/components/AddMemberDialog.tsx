@@ -76,8 +76,10 @@ export function AddMemberDialog({
                 role: memberToEdit.role || "",
                 bio: memberToEdit.bio || "",
                 photo_url: memberToEdit.photo_url || "",
-                linkedin_url: memberToEdit.linkedin_url || "",
-                github_url: memberToEdit.github_url || "",
+                linkedin_url: memberToEdit.linkedin_url
+                    ?.replace("https://www.linkedin.com/in/", "") || "",
+                github_url: memberToEdit.github_url
+                    ?.replace("https://github.com/", "") || "",
             });
         } else {
             reset(defaultValues);
@@ -89,10 +91,20 @@ export function AddMemberDialog({
         onOpenChange(false);
     };
     const onSubmit = async (data: FormValues) => {
-        await onSave(data, memberToEdit?.id);
+        const payload = {
+            ...data,
+            linkedin_url: data.linkedin_url
+                ? `https://www.linkedin.com/in/${data.linkedin_url}`
+                : "",
+            github_url: data.github_url
+                ? `https://github.com/${data.github_url}`
+                : "",
+        };
+        await onSave(payload, memberToEdit?.id);
         onOpenChange(false);
         reset(defaultValues);
     };
+
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

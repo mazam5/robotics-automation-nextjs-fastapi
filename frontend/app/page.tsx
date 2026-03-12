@@ -1,6 +1,6 @@
 "use client";
 
-import ContactSection from "@/components/home/ContactSection";
+import Contact from "@/components/home/Contact";
 import Footer from "@/components/home/Footer";
 import Hero from "@/components/home/Hero";
 import Journey from "@/components/home/Journey";
@@ -23,7 +23,7 @@ export default function Home() {
       <UseCases />
       <Team />
       <Journey />
-      <ContactSection />
+      <Contact />
       <Footer />
     </div>
   );

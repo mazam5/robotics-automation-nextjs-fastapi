@@ -27,6 +27,21 @@ export interface TeamMemberUpdate {
   linkedin_url?: string;
   github_url?: string;
 }
+export interface Milestone {
+    date: string;
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    position: "top" | "bottom";
+}
+
+export interface CardData {
+    index: string;
+    title: string;
+    video: string;
+    accentColor: string;
+    overlayColor: string;
+}
 
 export const teamMemberSchema = z.object({
   name: z.string().min(2, "Name is required"),

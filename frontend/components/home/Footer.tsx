@@ -82,24 +82,6 @@ const Footer = () => {
                             </Link>
                         ))}
                     </div>
-
-                    {/* Social links */}
-                    <div className="flex flex-col gap-3 sm:gap-4">
-                        <h4 className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-2 sm:mb-4 opacity-40">
-                            Social
-                        </h4>
-                        {["LinkedIn", "Twitter", "Instagram"].map((link) => (
-                            <Link
-                                key={link}
-                                href="#"
-                                onMouseEnter={handleLinkHover}
-                                onMouseLeave={handleLinkLeave}
-                                className="opacity-40 text-xs sm:text-sm tracking-wide transition-all no-underline hover:opacity-100"
-                            >
-                                {link}
-                            </Link>
-                        ))}
-                    </div>
                 </div>
 
                 {/* ── Separator ── */}
