@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -36,6 +36,15 @@ const teamMemberSchema = z.object({
 
 type FormValues = z.infer<typeof teamMemberSchema>;
 
+const EMPTY_VALUES: FormValues = {
+    name: "",
+    role: "",
+    bio: "",
+    photo_url: "",
+    linkedin_url: "",
+    github_url: "",
+};
+
 interface AddMemberDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -49,15 +58,20 @@ export function AddMemberDialog({
     memberToEdit,
     onSave,
 }: AddMemberDialogProps) {
-
-    const defaultValues: FormValues = {
-        name: "",
-        role: "",
-        bio: "",
-        photo_url: "",
-        linkedin_url: "",
-        github_url: "",
-    };
+    // Stable initial values derived from memberToEdit
+    const initialValues = useMemo<FormValues>(() => {
+        if (!memberToEdit) return EMPTY_VALUES;
+        return {
+            name: memberToEdit.name || "",
+            role: memberToEdit.role || "",
+            bio: memberToEdit.bio || "",
+            photo_url: memberToEdit.photo_url || "",
+            linkedin_url:
+                memberToEdit.linkedin_url?.replace("https://www.linkedin.com/in/", "") || "",
+            github_url:
+                memberToEdit.github_url?.replace("https://github.com/", "") || "",
+        };
+    }, [memberToEdit]);
 
     const {
         register,
@@ -66,30 +80,24 @@ export function AddMemberDialog({
         formState: { errors, isSubmitting },
     } = useForm<FormValues>({
         resolver: zodResolver(teamMemberSchema),
-        defaultValues,
+        defaultValues: EMPTY_VALUES,
     });
 
+    // Populate / clear the form whenever the dialog opens or the target member changes
     useEffect(() => {
-        if (memberToEdit) {
-            reset({
-                name: memberToEdit.name || "",
-                role: memberToEdit.role || "",
-                bio: memberToEdit.bio || "",
-                photo_url: memberToEdit.photo_url || "",
-                linkedin_url: memberToEdit.linkedin_url
-                    ?.replace("https://www.linkedin.com/in/", "") || "",
-                github_url: memberToEdit.github_url
-                    ?.replace("https://github.com/", "") || "",
-            });
+        if (open) {
+            reset(initialValues);
         } else {
-            reset(defaultValues);
+            // Always wipe the form when the dialog closes so stale values never bleed through
+            reset(EMPTY_VALUES);
         }
-    }, [memberToEdit, reset]);
+    }, [open, initialValues, reset]);
 
     const handleCancel = () => {
-        reset(defaultValues);
         onOpenChange(false);
+        // reset happens in the effect above when open → false
     };
+
     const onSubmit = async (data: FormValues) => {
         const payload = {
             ...data,
@@ -102,14 +110,12 @@ export function AddMemberDialog({
         };
         await onSave(payload, memberToEdit?.id);
         onOpenChange(false);
-        reset(defaultValues);
+        // reset happens in the effect above when open → false
     };
-
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="bg-zinc-900 border-white/10 text-white w-[95vw] sm:max-w-106.25">
-
                 <DialogHeader>
                     <DialogTitle>
                         {memberToEdit ? "Edit Team Member" : "Add Team Member"}
@@ -153,7 +159,6 @@ export function AddMemberDialog({
                             {...register("photo_url")}
                             className="bg-zinc-800 border-zinc-700"
                         />
-
                         {errors.photo_url && (
                             <p className="text-red-400 text-sm">{errors.photo_url.message}</p>
                         )}
@@ -162,12 +167,10 @@ export function AddMemberDialog({
                     {/* LinkedIn */}
                     <div className="grid gap-2">
                         <Label>LinkedIn</Label>
-
                         <InputGroup>
                             <InputGroupAddon>
                                 <InputGroupText>linkedin.com/in/</InputGroupText>
                             </InputGroupAddon>
-
                             <InputGroupInput
                                 placeholder="username"
                                 {...register("linkedin_url")}
@@ -179,12 +182,10 @@ export function AddMemberDialog({
                     {/* GitHub */}
                     <div className="grid gap-2">
                         <Label>GitHub</Label>
-
                         <InputGroup>
                             <InputGroupAddon>
                                 <InputGroupText>github.com/</InputGroupText>
                             </InputGroupAddon>
-
                             <InputGroupInput
                                 placeholder="username"
                                 {...register("github_url")}
@@ -192,9 +193,8 @@ export function AddMemberDialog({
                             />
                         </InputGroup>
                     </div>
+
                     <div className="flex gap-2">
-
-
                         <Button
                             type="submit"
                             disabled={isSubmitting}
@@ -206,9 +206,16 @@ export function AddMemberDialog({
                                     ? "Save Changes"
                                     : "Add Member"}
                         </Button>
-                        <Button disabled={isSubmitting} variant="outline" type="button" className="mt-2 text-white hover:bg-zinc-200" onClick={() => handleCancel()}>Cancel</Button>
+                        <Button
+                            disabled={isSubmitting}
+                            variant="outline"
+                            type="button"
+                            className="mt-2 text-white hover:bg-zinc-200"
+                            onClick={handleCancel}
+                        >
+                            Cancel
+                        </Button>
                     </div>
-
                 </form>
             </DialogContent>
         </Dialog>
