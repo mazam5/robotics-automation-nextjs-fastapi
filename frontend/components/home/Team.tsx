@@ -94,6 +94,9 @@ const Team = () => {
     const stickyRef = useRef<HTMLDivElement>(null);
     const carouselRef = useRef<HTMLDivElement>(null);
 
+    // Guard so entrance animations only fire once on initial load
+    const animationsRanRef = useRef(false);
+
     useTapToClick(carouselRef);
 
     useEffect(() => {
@@ -119,8 +122,11 @@ const Team = () => {
         });
     }, []);
 
+    // ── Entrance animations — runs ONCE when data first loads ──────────────
     useGSAP(() => {
-        if (!loading && members.length > 0) {
+        if (!loading && members.length > 0 && !animationsRanRef.current) {
+            animationsRanRef.current = true;
+
             const ctx = gsap.context(() => {
                 ScrollTrigger.create({
                     trigger: containerRef.current,
@@ -185,7 +191,13 @@ const Team = () => {
 
             return () => ctx.revert();
         }
-    }, { dependencies: [loading, members], scope: containerRef });
+    }, { dependencies: [loading], scope: containerRef });
+
+    useEffect(() => {
+        if (!loading && animationsRanRef.current) {
+            refreshScrollTriggers();
+        }
+    }, [members, loading, refreshScrollTriggers]);
 
     const handleSave = async (data: TeamMemberCreate | TeamMemberUpdate, id?: string) => {
         if (id) {
@@ -194,7 +206,6 @@ const Team = () => {
             await api.createTeamMember(data as TeamMemberCreate);
         }
         await fetchMembers();
-        refreshScrollTriggers();
     };
 
     const handleDeleteRequest = (member: TeamMember) => {
@@ -208,7 +219,6 @@ const Team = () => {
         try {
             await api.deleteTeamMember(memberToDelete.id);
             await fetchMembers();
-            refreshScrollTriggers();
         } catch (error) {
             console.error("Failed to delete member:", error);
         } finally {
