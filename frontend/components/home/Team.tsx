@@ -282,7 +282,7 @@ const Team = () => {
                     {/* ── Cards / Carousel ── */}
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {[1, 2, 3, 4].map((i) => (
+                            {[1, 2, 3].map((i) => (
                                 <div key={i} className="h-56 sm:h-64 md:h-72 rounded-xl bg-white/5 animate-pulse" />
                             ))}
                         </div>

@@ -4,10 +4,13 @@ import { useTheme } from "@/lib/ThemeContext";
 import { cn } from "@/lib/utils";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
+
+gsap.registerPlugin(ScrollToPlugin);
 
 export default function Navbar() {
     const { isLightMode } = useTheme();
@@ -19,13 +22,13 @@ export default function Navbar() {
         if (isMobileMenuOpen) {
             gsap.to(menuRef.current, {
                 x: 0,
-                duration: 0.5,
+                duration: 1,
                 ease: "power3.out",
             });
         } else {
             gsap.to(menuRef.current, {
                 x: "100%",
-                duration: 0.5,
+                duration: 2,
                 ease: "power3.in",
             });
         }
@@ -47,6 +50,32 @@ export default function Navbar() {
         });
     };
 
+    const handleNavClick = (
+        e: React.MouseEvent<HTMLAnchorElement>,
+        href: string
+    ) => {
+        if (!href.startsWith("#")) return;
+
+        e.preventDefault();
+
+        const target = document.querySelector(href);
+        if (!target) return;
+
+        // Close mobile menu first (if open), then scroll
+        if (isMobileMenuOpen) {
+            setIsMobileMenuOpen(false);
+        }
+
+        gsap.to(window, {
+            duration: 1,
+            scrollTo: {
+                y: target,
+                offsetY: 80, // adjust for fixed/sticky navbar height
+            },
+            ease: "power3.inOut",
+        });
+    };
+
     const navLinks = [
         { name: "Use Cases", href: "#use-cases" },
         { name: "Team", href: "#team" },
@@ -64,14 +93,15 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 group">
                     <Image
-                        src={isLightMode
-                            ? "https://armatrix.in/assets/images/logo/registered_logo.png"
-                            : "https://armatrix.in/assets/images/logo/Logo_2_white.webp"
+                        src={
+                            isLightMode
+                                ? "https://armatrix.in/assets/images/logo/registered_logo.png"
+                                : "https://armatrix.in/assets/images/logo/Logo_2_white.webp"
                         }
                         alt="Logo"
                         width={isLightMode ? 120 : 100}
                         height={isLightMode ? 120 : 100}
-                        className="transition-all duration-700 w-[100px] md:w-[140px] h-auto"
+                        className="transition-all duration-700 w-25 md:w-35 h-auto"
                     />
                 </Link>
 
@@ -83,9 +113,12 @@ export default function Navbar() {
                             href={link.href}
                             onMouseEnter={handleLinkMouseEnter}
                             onMouseLeave={handleLinkMouseLeave}
+                            onClick={(e) => handleNavClick(e, link.href)}
                             className={cn(
                                 "text-xl font-medium uppercase transition-colors duration-700 hover:underline underline-offset-8",
-                                isLightMode ? "text-zinc-600 hover:text-black" : "text-zinc-400 hover:text-white"
+                                isLightMode
+                                    ? "text-zinc-600 hover:text-black"
+                                    : "text-zinc-400 hover:text-white"
                             )}
                         >
                             {link.name}
@@ -119,7 +152,9 @@ export default function Navbar() {
                         <Link
                             key={link.name}
                             href={link.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
+                            onClick={(e) => {
+                                handleNavClick(e, link.href);
+                            }}
                             className={isLightMode ? "text-black" : "text-white"}
                         >
                             {link.name}
